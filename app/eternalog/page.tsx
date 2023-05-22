@@ -95,7 +95,7 @@ export default function Home() {
   let [initialCommand, setInitialCommand] = React.useState<boolean>(true);
   let [logCommand, setLogCommand] = React.useState<boolean>(false);
   let [categoryCommand, setCategoryCommand] = React.useState<boolean>(false);
-
+  let [categories, setCategories] = React.useState<string[]>([]);
   let [remainingSpace, setRemainingSpace] = React.useState<number>(0);
   let [remainingStoragePercentage, setRemainingStoragePercentage] =
     React.useState<number>(100);
@@ -114,6 +114,23 @@ export default function Home() {
 
   let [renamingText, setRenamingText] = React.useState<string | null>(null);
   let [renamingId, setRenamingId] = React.useState<number | null>(null);
+
+  let [selectedCategory, setSelectedCategory] = React.useState<string>("");
+  let [query, setQuery] = React.useState<string>("");
+  const filteredTexts = savedLogs.filter((log) => {
+    if (
+      query !== "" &&
+      // !textItem.text.toLowerCase().includes(query.toLowerCase())
+      !log.text.toLowerCase().includes(query.toLowerCase()) &&
+      !log.category.toLowerCase().includes(query.toLowerCase())
+    ) {
+      return false;
+    }
+    if (selectedCategory !== "" && !log.category.includes(selectedCategory)) {
+      return false;
+    }
+    return true;
+  });
 
   let stats = [
     {
@@ -181,6 +198,14 @@ export default function Home() {
 
     logRemainingLocalStorageSpace();
   }, []);
+
+  React.useEffect(() => {
+    const allCategories = new Set<string>();
+    savedLogs.forEach((log) => {
+      allCategories.add(log.category);
+    });
+    setCategories(Array.from(allCategories));
+  }, [savedLogs]);
 
   async function createCategory(event: React.SyntheticEvent) {
     if (inputText === "") return;
@@ -317,166 +342,22 @@ export default function Home() {
   }
 
   return (
-    //           <CommandGroup heading="My Categories">
-    //             {savedTexts.map((text) => (
-    //               <ContextMenu key={text.id}>
-    //                 <ContextMenuTrigger>
-    //                   <div className="flex justify-between items-center w-full">
-    //                     {renamingId === text.id ? (
-    //                       <div className="flex w-full space-x-2 mt-2 mb-2">
-    //                         <Input
-    //                           value={renamingText || ""}
-    //                           onChange={(e) => setRenamingText(e.target.value)}
-    //                           //   onBlur={() => renameTextItem(text.id)}
-    //                           autoFocus
-    //                         />
-    //                         <Button
-    //                           disabled={renamingText === null}
-    //                           onClick={() => renameTextItem(text.id)}
-    //                         >
-    //                           Rename
-    //                         </Button>
-    //                       </div>
-    //                     ) : (
-    //                       <CommandItem
-    //                         className="flex justify-between items-center w-full"
-    //                         onSelect={() => {
-    //                           setLogCommand(true);
-    //                           setInitialCommand(false);
-
-    //                           setCurrentCategory(text.text);
-
-    //                           console.log(
-    //                             `You're in the ${text.text} category`
-    //                           ); // print the category
-    //                         }}
-    //                       >
-    //                         <div className="flex">
-    //                           <BrainCog className="mr-2 h-4 w-4" />
-    //                           {text.text}
-    //                         </div>
-
-    //                         <TooltipProvider>
-    //                           <Tooltip>
-    //                             <TooltipTrigger>
-    //                               <Info className="h-4 w-4" />
-    //                             </TooltipTrigger>
-    //                             <TooltipContent>
-    //                               <p>
-    //                                 Right click this category to rename or
-    //                                 delete it.
-    //                               </p>
-    //                             </TooltipContent>
-    //                           </Tooltip>
-    //                         </TooltipProvider>
-    //                       </CommandItem>
-    //                     )}
-    //                   </div>
-    //                 </ContextMenuTrigger>
-    //                 <ContextMenuContent>
-    //                   <ContextMenuItem onSelect={() => setRenamingId(text.id)}>
-    //                     <Pen className="mr-2 h-4 w-4" />
-    //                     Rename
-    //                   </ContextMenuItem>
-    //                   <ContextMenuItem onSelect={() => deleteTextItem(text.id)}>
-    //                     <Trash className="mr-2 h-4 w-4" />
-    //                     Delete
-    //                   </ContextMenuItem>
-    //                 </ContextMenuContent>
-    //               </ContextMenu>
-    //             ))}
-    //           </CommandGroup>
-
-    //           <CommandSeparator />
-    //         </CommandList>
-    //       </>
-    //     )}
-
-    //     {logCommand && (
-    //       <>
-    //         <CommandList>
-    //           <CommandEmpty>No results found.</CommandEmpty>
-    //           <CommandGroup heading="Return">
-    //             <CommandItem
-    //               onSelect={() => {
-    //                 setInitialCommand(true);
-    //                 setLogCommand(false);
-    //               }}
-    //             >
-    //               <CornerDownLeft className="mr-2 h-4 w-4" />
-    //               Main Menu
-    //             </CommandItem>
-    //           </CommandGroup>
-    //           <CommandSeparator />
-    //         </CommandList>
-    //         <CommandList>
-    //           <CommandGroup
-    //             heading={`Create a new log in category: ${
-    //               currentCategory ? currentCategory : "Default"
-    //             }`}
-    //           >
-    //             <CommandItem>
-    //               <Textarea
-    //                 onChange={handleLogChange}
-    //                 placeholder="Ex. Cool design I saw today..."
-    //                 onKeyDown={(e) => {
-    //                   if (e.key === "Enter") {
-    //                     createLog(e);
-    //                     setCategoryCommand(false);
-    //                     setLogCommand(false);
-    //                     setInitialCommand(true);
-    //                     setOpen(false);
-    //                   }
-    //                 }}
-    //               />
-    //             </CommandItem>
-    //           </CommandGroup>
-    //         </CommandList>
-    //       </>
-    //     )}
-
-    //     {categoryCommand && (
-    //       <>
-    //         <CommandList>
-    //           <CommandEmpty>No results found.</CommandEmpty>
-    //           <CommandGroup heading="Return">
-    //             <CommandItem
-    //               onSelect={() => {
-    //                 setInitialCommand(true);
-    //                 setCategoryCommand(false);
-    //               }}
-    //             >
-    //               <CornerDownLeft className="mr-2 h-4 w-4" />
-    //               Main Menu
-    //             </CommandItem>
-    //           </CommandGroup>
-    //           <CommandSeparator />
-    //         </CommandList>
-    //         <CommandList>
-    //           <CommandGroup heading="Create a new category">
-    //             <CommandItem>
-    //               <Input
-    //                 onChange={handleInputChange}
-    //                 placeholder="Ex... Design"
-    //                 value={inputText}
-    //                 onKeyDown={(e) => {
-    //                   if (e.key === "Enter") {
-    //                     createCategory(e);
-    //                     setInitialCommand(true);
-    //                     setCategoryCommand(false);
-    //                   }
-    //                 }}
-    //               />
-    //             </CommandItem>
-    //           </CommandGroup>
-    //         </CommandList>
-    //       </>
-    //     )}
-    //   </CommandDialog>
-
     <>
       <div>
-        <Navbar />
+        {/* <Navbar /> */}
+
+        {/* the navbar should get passed all the logs */}
+        <Navbar
+          savedLogs={savedLogs}
+          onSelect={(selectedTeam) => {
+            //    setCategory(selectedTeam.label);
+            //   set the query to the selected team
+            setQuery(selectedTeam.label);
+            console.log(
+              `Selected category from grandparent component: ${selectedTeam.label}`
+            );
+          }}
+        />
 
         <div>
           {/* Sticky search header */}
@@ -491,15 +372,8 @@ export default function Home() {
                   Search
                 </label>
                 <div className="relative w-full">
-                  {/* <input
-                    id="search-field"
-                    className="block h-full w-full border-0 bg-transparent py-0 pl-8 pr-0 text-white focus:ring-0 sm:text-sm focus:ring-offset-0"
-                    placeholder="Search for logs..."
-                    type="search"
-                    name="search"
-                    autoComplete="off"
-                  /> */}
                   <Input
+                    onChange={(event) => setQuery(event.target.value)}
                     placeholder="Search for logs..."
                     type="search"
                     name="search"
@@ -790,111 +664,6 @@ export default function Home() {
 
               <div className="mt-4 mb-8" />
 
-              {/* <table className="mt-6 w-full whitespace-nowrap text-left">
-                <colgroup>
-                  <col className="w-full sm:w-4/12" />
-                  <col className="lg:w-4/12" />
-                  <col className="lg:w-2/12" />
-                  <col className="lg:w-1/12" />
-                  <col className="lg:w-1/12" />
-                </colgroup>
-                <thead className="border-b border-white/10 text-sm leading-6 text-primary">
-                  <tr>
-                    <th
-                      scope="col"
-                      className="py-2 pl-4 pr-8 font-semibold sm:pl-6 lg:pl-8"
-                    >
-                      Log Name
-                    </th>
-                    <th
-                      scope="col"
-                      className="hidden py-2 pl-0 pr-8 font-semibold sm:table-cell"
-                    >
-                      Category
-                    </th>
-                    <th
-                      scope="col"
-                      className="py-2 pl-0 pr-4 text-right font-semibold sm:pr-8 sm:text-left lg:pr-20"
-                    />
-                    <th
-                      scope="col"
-                      className="hidden py-2 pl-0 pr-8 font-semibold md:table-cell lg:pr-20"
-                    >
-                      Size (KB)
-                    </th>
-                    <th
-                      scope="col"
-                      className="hidden py-2 pl-0 pr-4 text-right font-semibold sm:table-cell sm:pr-6 lg:pr-8"
-                    >
-                      Created
-                    </th>
-                    <th
-                      scope="col"
-                      className="hidden py-2 pl-0 pr-4 text-right font-semibold sm:table-cell sm:pr-6 lg:pr-8"
-                    >
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-
-                <tbody className="divide-y divide-white/5">
-                  {savedLogs.map((log) => (
-                    <tr
-                      key={log.id}
-                      className="hover:bg-muted/50 transition-all duration-150"
-                    >
-                      <td className="py-4 pl-4 pr-8 sm:pl-6 lg:pl-8">
-                        <div className="flex items-center gap-x-4">
-                          <div className="truncate text-sm font-medium leading-6 text-primary max-w-xs">
-                            {log.text}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="hidden py-4 pl-0 pr-4 sm:table-cell sm:pr-8">
-                        <div className="flex gap-x-3">
-                          <Badge>{log.category}</Badge>
-                        </div>
-                      </td>
-                      <td className="py-4 pl-0 pr-4 text-sm leading-6 sm:pr-8 lg:pr-20">
-                        <div className="flex items-center justify-end gap-x-2 sm:justify-start" />
-                      </td>
-                      <td className="hidden py-4 pl-0 pr-8 text-sm leading-6 text-gray-400 md:table-cell lg:pr-20">
-                        {log.size}
-                      </td>
-                      <td className="hidden py-4 pl-0 pr-4 text-right text-sm leading-6 text-gray-400 sm:table-cell sm:pr-6 lg:pr-8">
-                        <time>
-                          {log.createdTime
-                            ? log.createdTime.toLocaleString()
-                            : ""}
-                        </time>
-                      </td>
-                      <td className="hidden py-4 pl-0 pr-4 text-right text-sm leading-6 text-gray-400 sm:table-cell sm:pr-6 lg:pr-8">
-                       
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost">
-                              <MoreHorizontal className="h-5 w-5" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent className="w-56">
-                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-
-                            <DropdownMenuItem>
-                              <Trash className="mr-2 h-4 w-4" />
-                              <span>GitHub</span>
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem>
-                              <Pen className="mr-2 h-4 w-4" />
-                              <span>API</span>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table> */}
               <Table>
                 <TableCaption>A list of your recent logs.</TableCaption>
                 <TableHeader>
@@ -908,8 +677,8 @@ export default function Home() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {savedLogs.length > 0 ? (
-                    savedLogs.map((log) => (
+                  {filteredTexts.length > 0 ? (
+                    filteredTexts.map((log, index) => (
                       <TableRow key={log.id}>
                         <Sheet>
                           <TableCell className="font-medium truncate max-w-[300px]">

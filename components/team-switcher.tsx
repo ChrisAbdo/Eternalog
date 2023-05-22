@@ -39,44 +39,40 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const groups = [
-  {
-    label: "Personal Account",
-    teams: [
-      {
-        label: "Alicia Koch",
-        value: "personal",
-      },
-    ],
-  },
-  {
-    label: "Teams",
-    teams: [
-      {
-        label: "Acme Inc.",
-        value: "acme-inc",
-      },
-      {
-        label: "Monsters Inc.",
-        value: "monsters",
-      },
-    ],
-  },
-];
-
-type Team = (typeof groups)[number]["teams"][number];
-
 type PopoverTriggerProps = React.ComponentPropsWithoutRef<
   typeof PopoverTrigger
 >;
 
 interface TeamSwitcherProps extends PopoverTriggerProps {}
 
-export default function TeamSwitcher({ className }: TeamSwitcherProps) {
+export default function TeamSwitcher({
+  className,
+  // @ts-ignore
+  savedLogs,
+  onSelect, // Add this line
+}: TeamSwitcherProps) {
+  type Team = { label: string; value: string };
+  type Group = { teams: Team[] };
+
+  const uniqueCategories = [
+    // @ts-ignore
+    ...new Set(savedLogs.map((log: any) => log.category)),
+  ];
+
+  const groups: Group[] = uniqueCategories.map((category) => ({
+    // label: category,
+    teams: [
+      {
+        label: category,
+        value: category,
+      },
+    ],
+  }));
+
   const [open, setOpen] = React.useState(false);
   const [showNewTeamDialog, setShowNewTeamDialog] = React.useState(false);
   const [selectedTeam, setSelectedTeam] = React.useState<Team>(
-    groups[0].teams[0]
+    groups[0]?.teams[0]
   );
 
   return (
@@ -93,12 +89,12 @@ export default function TeamSwitcher({ className }: TeamSwitcherProps) {
           >
             <Avatar className="mr-2 h-5 w-5">
               <AvatarImage
-                src={`https://avatar.vercel.sh/${selectedTeam.value}.png`}
-                alt={selectedTeam.label}
+                src={`https://avatar.vercel.sh/${selectedTeam?.value}.png`}
+                alt={selectedTeam?.label}
               />
               <AvatarFallback>SC</AvatarFallback>
             </Avatar>
-            {selectedTeam.label}
+            {selectedTeam?.label}
             <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
@@ -108,6 +104,7 @@ export default function TeamSwitcher({ className }: TeamSwitcherProps) {
               <CommandInput placeholder="Search team..." />
               <CommandEmpty>No team found.</CommandEmpty>
               {groups.map((group) => (
+                // @ts-ignore
                 <CommandGroup key={group.label} heading={group.label}>
                   {group.teams.map((team) => (
                     <CommandItem
@@ -115,6 +112,9 @@ export default function TeamSwitcher({ className }: TeamSwitcherProps) {
                       onSelect={() => {
                         setSelectedTeam(team);
                         setOpen(false);
+                        // @ts-ignore
+                        onSelect(team);
+                        console.log(`Selected category: ${team.label}`);
                       }}
                       className="text-sm"
                     >
@@ -129,7 +129,7 @@ export default function TeamSwitcher({ className }: TeamSwitcherProps) {
                       <Check
                         className={cn(
                           "ml-auto h-4 w-4",
-                          selectedTeam.value === team.value
+                          selectedTeam?.value === team.value
                             ? "opacity-100"
                             : "opacity-0"
                         )}
@@ -150,7 +150,7 @@ export default function TeamSwitcher({ className }: TeamSwitcherProps) {
                     }}
                   >
                     <PlusCircle className="mr-2 h-5 w-5" />
-                    Create Team
+                    Create Category
                   </CommandItem>
                 </DialogTrigger>
               </CommandGroup>
@@ -160,39 +160,15 @@ export default function TeamSwitcher({ className }: TeamSwitcherProps) {
       </Popover>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create team</DialogTitle>
+          <DialogTitle>Create category</DialogTitle>
           <DialogDescription>
             Add a new team to manage products and customers.
           </DialogDescription>
         </DialogHeader>
         <div>
-          <div className="space-y-4 py-2 pb-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Team name</Label>
-              <Input id="name" placeholder="Acme Inc." />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="plan">Subscription plan</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a plan" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="free">
-                    <span className="font-medium">Free</span> -{" "}
-                    <span className="text-muted-foreground">
-                      Trial for two weeks
-                    </span>
-                  </SelectItem>
-                  <SelectItem value="pro">
-                    <span className="font-medium">Pro</span> -{" "}
-                    <span className="text-muted-foreground">
-                      $9/month per user
-                    </span>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="name">Team name</Label>
+            <Input id="name" placeholder="Acme Inc." autoComplete="off" />
           </div>
         </div>
         <DialogFooter>

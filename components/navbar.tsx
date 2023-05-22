@@ -10,7 +10,12 @@ import { Brain } from "lucide-react";
 import ThemeSwitcher from "./theme-switch";
 import Link from "next/link";
 
-export default function Navbar() {
+interface NavbarProps {
+  savedLogs: any;
+  onSelect: (selectedTeam: { label: string; value: string }) => void;
+}
+
+export default function Navbar({ savedLogs, onSelect }: NavbarProps) {
   return (
     <div className="border-b">
       <div className="flex h-16 items-center px-4">
@@ -19,7 +24,8 @@ export default function Navbar() {
           Eternalog
         </Link>
         <h1 className="ml-6 mr-6">/</h1>
-        <TeamSwitcher />
+        {/* @ts-ignore */}
+        <TeamSwitcher savedLogs={savedLogs} onSelect={onSelect} />
         <MainNav className="mx-6" />
         <div className="ml-auto flex items-center space-x-4">
           <ThemeSwitcher />
