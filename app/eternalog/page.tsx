@@ -11,6 +11,7 @@ import {
   BrainCog,
   CornerDownLeft,
   Info,
+  MoreHorizontal,
   Pen,
   Plus,
   Trash,
@@ -40,6 +41,36 @@ import {
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import TableSkeleton from "@/components/skeletons/table-skeleton";
+import { Label } from "@/components/ui/label";
 
 interface TextItem {
   text: string;
@@ -53,13 +84,6 @@ interface LogItem {
   createdTime: string;
   size: number;
 }
-
-const stats = [
-  { name: "Number of deploys", value: "405" },
-  { name: "Average deploy time", value: "3.65", unit: "mins" },
-  { name: "Number of servers", value: "3" },
-  { name: "Remaining Storage", value: "98.5%" },
-];
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
@@ -75,6 +99,8 @@ export default function Home() {
   let [remainingSpace, setRemainingSpace] = React.useState<number>(0);
   let [remainingStoragePercentage, setRemainingStoragePercentage] =
     React.useState<number>(100);
+  let [useStoragePercentage, setUsedStoragePercentage] =
+    React.useState<number>(0);
 
   let [currentCategory, setCurrentCategory] = React.useState<string>("");
 
@@ -88,6 +114,48 @@ export default function Home() {
 
   let [renamingText, setRenamingText] = React.useState<string | null>(null);
   let [renamingId, setRenamingId] = React.useState<number | null>(null);
+
+  let stats = [
+    {
+      name: "Number of logs",
+      value:
+        savedLogs && savedLogs.length > 0 ? (
+          savedLogs.length
+        ) : (
+          <Skeleton className="w-[100px] h-[40px] rounded-md" />
+        ),
+    },
+    {
+      name: "Number of categories",
+      value:
+        savedTexts && savedTexts.length > 0 ? (
+          savedTexts.length
+        ) : (
+          <Skeleton className="w-[100px] h-[40px] rounded-md" />
+        ),
+    },
+    {
+      name: "Storage used",
+      value:
+        useStoragePercentage && useStoragePercentage > 0 ? (
+          useStoragePercentage
+        ) : (
+          <Skeleton className="w-[100px] h-[40px] rounded-md" />
+        ),
+      unit: useStoragePercentage > 0 ? "%" : "",
+    },
+    {
+      name: "Remaining Storage (KB)",
+      value:
+        remainingSpace && remainingSpace > 0 ? (
+          remainingSpace
+        ) : (
+          <Skeleton className="w-[150px] h-[40px] rounded-md" />
+        ),
+
+      unit: remainingSpace > 0 ? "KB" : "",
+    },
+  ];
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -227,6 +295,15 @@ export default function Home() {
     setRemainingSpace(remainingStorage);
 
     let percentage = (remainingStorage / totalStorage) * 100;
+    //   format to only 2 decimal places
+    percentage = Math.round(percentage * 100) / 100;
+
+    //   calculate the used storage
+    let usedStoragePercentage = 100 - percentage;
+    //   format to only 2 decimal places
+    usedStoragePercentage = Math.round(usedStoragePercentage * 100) / 100;
+    setUsedStoragePercentage(usedStoragePercentage);
+
     setRemainingStoragePercentage(percentage);
   }
 
@@ -240,63 +317,6 @@ export default function Home() {
   }
 
   return (
-    // <div>
-    //   <Navbar />
-    //   <CommandDialog
-    //     open={open}
-    //     onOpenChange={() => {
-    //       setOpen(!open);
-    //       setLogCommand(false);
-    //       setInitialCommand(true);
-    //       setCategoryCommand(false);
-    //       setRenamingId(null);
-    //       setRenamingText(null);
-    //     }}
-    //   >
-    //     {initialCommand && (
-    //       <>
-    //         <CommandInput placeholder="Search for category" />
-
-    //         <CommandList>
-    //           <CommandEmpty>No results found.</CommandEmpty>
-    //           <CommandGroup heading="Create">
-    //             <CommandItem
-    //               onSelect={() => {
-    //                 setInitialCommand(false);
-    //                 setCategoryCommand(true);
-    //               }}
-    //             >
-    //               <Plus className="h-5 w-5 mr-2 order-first" />
-    //               New Category
-    //             </CommandItem>
-    //           </CommandGroup>
-    //           <CommandGroup heading="Preset Categories">
-    //             <CommandItem
-    //               onSelect={() => {
-    //                 setCategoryCommand(false);
-    //                 setInitialCommand(false);
-    //                 setLogCommand(true);
-    //                 setCurrentCategory("Thoughts");
-    //               }}
-    //             >
-    //               <Brain className="mr-2 h-4 w-4" />
-    //               Thoughts
-    //             </CommandItem>
-    //             <CommandItem
-    //               onSelect={() => {
-    //                 setCategoryCommand(false);
-    //                 setInitialCommand(false);
-    //                 setLogCommand(true);
-    //                 setCurrentCategory("Bookmarks");
-    //               }}
-    //             >
-    //               <BookOpen className="mr-2 h-4 w-4" />
-    //               Bookmarks
-    //             </CommandItem>
-    //           </CommandGroup>
-
-    //           <CommandSeparator />
-
     //           <CommandGroup heading="My Categories">
     //             {savedTexts.map((text) => (
     //               <ContextMenu key={text.id}>
@@ -511,16 +531,16 @@ export default function Home() {
                     <p className="text-sm font-medium leading-6 text-gray-400">
                       {stat.name}
                     </p>
-                    <p className="mt-2 flex items-baseline gap-x-2">
-                      <span className="text-4xl font-semibold tracking-tight text-primary">
+                    <div className="mt-2 flex items-baseline gap-x-2">
+                      <div className="text-4xl font-semibold tracking-tight text-primary">
                         {stat.value}
-                      </span>
+                      </div>
                       {stat.unit ? (
                         <span className="text-sm text-gray-400">
                           {stat.unit}
                         </span>
                       ) : null}
-                    </p>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -600,79 +620,85 @@ export default function Home() {
                       <CommandSeparator />
 
                       <CommandGroup heading="My Categories">
-                        {savedTexts.map((text) => (
-                          <ContextMenu key={text.id}>
-                            <ContextMenuTrigger>
-                              <div className="flex justify-between items-center w-full">
-                                {renamingId === text.id ? (
-                                  <div className="flex w-full space-x-2 mt-2 mb-2">
-                                    <Input
-                                      value={renamingText || ""}
-                                      onChange={(e) =>
-                                        setRenamingText(e.target.value)
-                                      }
-                                      //   onBlur={() => renameTextItem(text.id)}
-                                      autoFocus
-                                    />
-                                    <Button
-                                      disabled={renamingText === null}
-                                      onClick={() => renameTextItem(text.id)}
-                                    >
-                                      Rename
-                                    </Button>
-                                  </div>
-                                ) : (
-                                  <CommandItem
-                                    className="flex justify-between items-center w-full"
-                                    onSelect={() => {
-                                      setLogCommand(true);
-                                      setInitialCommand(false);
-
-                                      setCurrentCategory(text.text);
-
-                                      console.log(
-                                        `You're in the ${text.text} category`
-                                      ); // print the category
-                                    }}
-                                  >
-                                    <div className="flex">
-                                      <BrainCog className="mr-2 h-4 w-4" />
-                                      {text.text}
+                        {savedTexts.length > 0 ? (
+                          savedTexts.map((text) => (
+                            <ContextMenu key={text.id}>
+                              <ContextMenuTrigger>
+                                <div className="flex justify-between items-center w-full">
+                                  {renamingId === text.id ? (
+                                    <div className="flex w-full space-x-2 mt-2 mb-2">
+                                      <Input
+                                        value={renamingText || ""}
+                                        onChange={(e) =>
+                                          setRenamingText(e.target.value)
+                                        }
+                                        //   onBlur={() => renameTextItem(text.id)}
+                                        autoFocus
+                                      />
+                                      <Button
+                                        disabled={renamingText === null}
+                                        onClick={() => renameTextItem(text.id)}
+                                      >
+                                        Rename
+                                      </Button>
                                     </div>
+                                  ) : (
+                                    <CommandItem
+                                      className="flex justify-between items-center w-full"
+                                      onSelect={() => {
+                                        setLogCommand(true);
+                                        setInitialCommand(false);
 
-                                    <TooltipProvider>
-                                      <Tooltip>
-                                        <TooltipTrigger>
-                                          <Info className="h-4 w-4" />
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          <p>
-                                            Right click this category to rename
-                                            or delete it.
-                                          </p>
-                                        </TooltipContent>
-                                      </Tooltip>
-                                    </TooltipProvider>
-                                  </CommandItem>
-                                )}
-                              </div>
-                            </ContextMenuTrigger>
-                            <ContextMenuContent>
-                              <ContextMenuItem
-                                onSelect={() => setRenamingId(text.id)}
-                              >
-                                <Pen className="mr-2 h-4 w-4" />
-                                Rename
-                              </ContextMenuItem>
-                              <ContextMenuItem
-                                onSelect={() => deleteTextItem(text.id)}
-                              >
-                                <Trash className="mr-2 h-4 w-4" />
-                                Delete
-                              </ContextMenuItem>
-                            </ContextMenuContent>
-                          </ContextMenu>
-                        ))}
+                                        setCurrentCategory(text.text);
+
+                                        console.log(
+                                          `in the ${text.text} category`
+                                        ); // print the category
+                                      }}
+                                    >
+                                      <div className="flex">
+                                        <BrainCog className="mr-2 h-4 w-4" />
+                                        {text.text}
+                                      </div>
+
+                                      <TooltipProvider>
+                                        <Tooltip>
+                                          <TooltipTrigger>
+                                            <Info className="h-4 w-4" />
+                                          </TooltipTrigger>
+                                          <TooltipContent>
+                                            <p>
+                                              Right click this category to
+                                              rename or delete it.
+                                            </p>
+                                          </TooltipContent>
+                                        </Tooltip>
+                                      </TooltipProvider>
+                                    </CommandItem>
+                                  )}
+                                </div>
+                              </ContextMenuTrigger>
+                              <ContextMenuContent>
+                                <ContextMenuItem
+                                  onSelect={() => setRenamingId(text.id)}
+                                >
+                                  <Pen className="mr-2 h-4 w-4" />
+                                  Rename
+                                </ContextMenuItem>
+                                <ContextMenuItem
+                                  onSelect={() => deleteTextItem(text.id)}
+                                >
+                                  <Trash className="mr-2 h-4 w-4" />
+                                  Delete
+                                </ContextMenuItem>
+                              </ContextMenuContent>
+                            </ContextMenu>
+                          ))
+                        ) : (
+                          <h1 className="text-sm text-gray-400">
+                            You don&apos;t have any saved categories yet.
+                          </h1>
+                        )}
                       </CommandGroup>
 
                       <CommandSeparator />
@@ -762,10 +788,9 @@ export default function Home() {
                 )}
               </CommandDialog>
 
-              <h2 className="px-4 text-base font-semibold leading-7 text-primary sm:px-6 lg:px-8">
-                Recent Logs
-              </h2>
-              <table className="mt-6 w-full whitespace-nowrap text-left">
+              <div className="mt-4 mb-8" />
+
+              {/* <table className="mt-6 w-full whitespace-nowrap text-left">
                 <colgroup>
                   <col className="w-full sm:w-4/12" />
                   <col className="lg:w-4/12" />
@@ -803,18 +828,20 @@ export default function Home() {
                     >
                       Created
                     </th>
+                    <th
+                      scope="col"
+                      className="hidden py-2 pl-0 pr-4 text-right font-semibold sm:table-cell sm:pr-6 lg:pr-8"
+                    >
+                      Actions
+                    </th>
                   </tr>
                 </thead>
 
                 <tbody className="divide-y divide-white/5">
-                  {/* {activityItems.map((item) => ( */}
                   {savedLogs.map((log) => (
                     <tr
                       key={log.id}
-                      className="hover:bg-secondary transition-all duration-150"
-                      onClick={() => {
-                        deleteLogItem(log.id);
-                      }}
+                      className="hover:bg-muted/50 transition-all duration-150"
                     >
                       <td className="py-4 pl-4 pr-8 sm:pl-6 lg:pl-8">
                         <div className="flex items-center gap-x-4">
@@ -841,10 +868,125 @@ export default function Home() {
                             : ""}
                         </time>
                       </td>
+                      <td className="hidden py-4 pl-0 pr-4 text-right text-sm leading-6 text-gray-400 sm:table-cell sm:pr-6 lg:pr-8">
+                       
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost">
+                              <MoreHorizontal className="h-5 w-5" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="w-56">
+                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+
+                            <DropdownMenuItem>
+                              <Trash className="mr-2 h-4 w-4" />
+                              <span>GitHub</span>
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem>
+                              <Pen className="mr-2 h-4 w-4" />
+                              <span>API</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table> */}
+              <Table>
+                <TableCaption>A list of your recent logs.</TableCaption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Log Name</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Size</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead>View</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {savedLogs.length > 0 ? (
+                    savedLogs.map((log) => (
+                      <TableRow key={log.id}>
+                        <Sheet>
+                          <TableCell className="font-medium truncate max-w-[300px]">
+                            {log.text}
+                          </TableCell>
+                          <TableCell>
+                            <Badge>{log.category}</Badge>
+                          </TableCell>
+                          <TableCell>{log.size}</TableCell>
+                          <TableCell>
+                            <time>
+                              {log.createdTime
+                                ? log.createdTime.toLocaleString()
+                                : ""}
+                            </time>
+                          </TableCell>
+                          <TableCell>
+                            <Sheet>
+                              <SheetTrigger>
+                                {" "}
+                                <Button variant="ghost">
+                                  <BookOpen className="h-5 w-5" />
+                                  <span className="ml-2">View Log</span>
+                                </Button>
+                              </SheetTrigger>
+                              <SheetContent>
+                                <SheetHeader>
+                                  <SheetTitle>View Log</SheetTitle>
+                                  <SheetTitle>
+                                    <div className="flex space-x-2">
+                                      <Badge>{log.category}</Badge>
+                                      <Badge>{log.size} KB</Badge>
+                                    </div>
+                                  </SheetTitle>
+                                  <SheetDescription>
+                                    {log.text}
+                                  </SheetDescription>
+                                </SheetHeader>
+                              </SheetContent>
+                            </Sheet>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost">
+                                  <MoreHorizontal className="h-5 w-5" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent className="w-56">
+                                <DropdownMenuLabel>
+                                  Log Actions
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuGroup>
+                                  <DropdownMenuItem disabled>
+                                    <Pen className="mr-2 h-4 w-4" />
+                                    <span>Coming Soon!</span>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem
+                                    onSelect={() => deleteLogItem(log.id)}
+                                  >
+                                    <Trash className="mr-2 h-4 w-4" />
+                                    <span>Delete</span>
+                                  </DropdownMenuItem>
+                                </DropdownMenuGroup>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </Sheet>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableSkeleton />
+                  )}
+                </TableBody>
+              </Table>
             </div>
           </main>
         </div>
