@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Check, ChevronsUpDown, PlusCircle } from "lucide-react";
+import { Brain, Check, ChevronsUpDown, PlusCircle } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -31,13 +31,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 type PopoverTriggerProps = React.ComponentPropsWithoutRef<
   typeof PopoverTrigger
@@ -45,11 +38,16 @@ type PopoverTriggerProps = React.ComponentPropsWithoutRef<
 
 interface TeamSwitcherProps extends PopoverTriggerProps {}
 
+interface TextItem {
+  text: string;
+  id: number;
+}
+
 export default function TeamSwitcher({
   className,
   // @ts-ignore
   savedLogs,
-  onSelect, // Add this line
+  onSelect,
 }: TeamSwitcherProps) {
   type Team = { label: string; value: string };
   type Group = { teams: Team[] };
@@ -69,11 +67,39 @@ export default function TeamSwitcher({
     ],
   }));
 
-  const [open, setOpen] = React.useState(false);
-  const [showNewTeamDialog, setShowNewTeamDialog] = React.useState(false);
+  const [inputText, setInputText] = React.useState<string>("");
+  const [open, setOpen] = React.useState<boolean>(false);
+  const [showNewTeamDialog, setShowNewTeamDialog] =
+    React.useState<boolean>(false);
   const [selectedTeam, setSelectedTeam] = React.useState<Team>(
     groups[0]?.teams[0]
   );
+  let [savedTexts, setSavedTexts] = React.useState<TextItem[]>([]);
+
+  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>): void {
+    setInputText(event.target.value);
+  }
+
+  async function createCategory(event: React.SyntheticEvent) {
+    console.log("Create category called with event: ", event);
+
+    if (inputText === "") return;
+
+    const newTexts: TextItem[] = [
+      ...savedTexts,
+      {
+        text: inputText,
+        // id should increment by 1
+        id: savedTexts.length + 1,
+      },
+    ];
+
+    localStorage.setItem("texts", JSON.stringify(newTexts));
+    setSavedTexts(newTexts);
+    setInputText("");
+
+    console.log(newTexts);
+  }
 
   return (
     <Dialog open={showNewTeamDialog} onOpenChange={setShowNewTeamDialog}>
@@ -92,17 +118,46 @@ export default function TeamSwitcher({
                 src={`https://avatar.vercel.sh/${selectedTeam?.value}.png`}
                 alt={selectedTeam?.label}
               />
-              <AvatarFallback>SC</AvatarFallback>
+              <AvatarFallback>
+                <Brain />
+              </AvatarFallback>
             </Avatar>
-            {selectedTeam?.label}
+            {selectedTeam?.label || "Sort by category"}
             <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[200px] p-0">
           <Command>
             <CommandList>
-              <CommandInput placeholder="Search team..." />
+              <CommandInput placeholder="Search category..." />
               <CommandEmpty>No team found.</CommandEmpty>
+              <CommandGroup heading="My Categories">
+                <CommandItem
+                  onSelect={() => {
+                    setSelectedTeam({ label: "", value: "" });
+                    setOpen(false);
+                    // @ts-ignore
+                    onSelect({ label: "", value: "" });
+                  }}
+                  className="text-sm"
+                >
+                  <Avatar className="mr-2 h-5 w-5">
+                    <AvatarImage
+                      src={`https://avatar.vercel.sh/.png`}
+                      alt="All"
+                    />
+                    <AvatarFallback>SC</AvatarFallback>
+                  </Avatar>
+                  All
+                  <Check
+                    className={cn(
+                      "ml-auto h-4 w-4",
+                      selectedTeam?.value === "" ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                </CommandItem>
+              </CommandGroup>
+
               {groups.map((group) => (
                 // @ts-ignore
                 <CommandGroup key={group.label} heading={group.label}>
@@ -144,10 +199,12 @@ export default function TeamSwitcher({
               <CommandGroup>
                 <DialogTrigger asChild>
                   <CommandItem
-                    onSelect={() => {
-                      setOpen(false);
-                      setShowNewTeamDialog(true);
-                    }}
+                    // onSelect={() => {
+                    //   setOpen(false);
+                    //   setShowNewTeamDialog(true);
+                    // }}
+                    disabled
+                    className="cursor-not-allowed"
                   >
                     <PlusCircle className="mr-2 h-5 w-5" />
                     Create Category
@@ -160,7 +217,7 @@ export default function TeamSwitcher({
       </Popover>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create category</DialogTitle>
+          <DialogTitle>Create category | Coming soon</DialogTitle>
           <DialogDescription>
             Add a new team to manage products and customers.
           </DialogDescription>
@@ -168,14 +225,21 @@ export default function TeamSwitcher({
         <div>
           <div className="space-y-2">
             <Label htmlFor="name">Team name</Label>
-            <Input id="name" placeholder="Acme Inc." autoComplete="off" />
+            <Input
+              onChange={handleInputChange}
+              id="name"
+              placeholder="Acme Inc."
+              autoComplete="off"
+            />
           </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => setShowNewTeamDialog(false)}>
             Cancel
           </Button>
-          <Button type="submit">Continue</Button>
+          <Button disabled type="submit">
+            Continue
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

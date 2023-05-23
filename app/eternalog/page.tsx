@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import {
   BookOpen,
+  BookUp,
   Brain,
   BrainCog,
   CornerDownLeft,
@@ -70,7 +71,17 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import TableSkeleton from "@/components/skeletons/table-skeleton";
-import { Label } from "@/components/ui/label";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface TextItem {
   text: string;
@@ -91,6 +102,8 @@ function classNames(...classes: any[]) {
 
 export default function Home() {
   let { toast } = useToast();
+
+  let [mounted, setMounted] = React.useState<boolean>(false);
 
   let [initialCommand, setInitialCommand] = React.useState<boolean>(true);
   let [logCommand, setLogCommand] = React.useState<boolean>(false);
@@ -117,7 +130,7 @@ export default function Home() {
 
   let [selectedCategory, setSelectedCategory] = React.useState<string>("");
   let [query, setQuery] = React.useState<string>("");
-  const filteredTexts = savedLogs.filter((log) => {
+  let filteredTexts = savedLogs.filter((log) => {
     if (
       query !== "" &&
       // !textItem.text.toLowerCase().includes(query.toLowerCase())
@@ -175,6 +188,10 @@ export default function Home() {
   ];
 
   React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && e.metaKey) {
         setOpen((open) => !open);
@@ -208,6 +225,8 @@ export default function Home() {
   }, [savedLogs]);
 
   async function createCategory(event: React.SyntheticEvent) {
+    console.log("Create category called with event: ", event);
+
     if (inputText === "") return;
 
     const newTexts: TextItem[] = [
@@ -344,30 +363,26 @@ export default function Home() {
   return (
     <>
       <div>
-        {/* <Navbar /> */}
-
-        {/* the navbar should get passed all the logs */}
         <Navbar
           savedLogs={savedLogs}
           onSelect={(selectedTeam) => {
-            //    setCategory(selectedTeam.label);
-            //   set the query to the selected team
             setQuery(selectedTeam.label);
             console.log(
               `Selected category from grandparent component: ${selectedTeam.label}`
             );
           }}
+          createCategory={createCategory}
         />
 
         <div>
           {/* Sticky search header */}
-          <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-6 border-b border-white/5 px-4 shadow-sm sm:px-6 lg:px-8">
+          <div className="sticky top-0 z-50 bg-background flex h-16 shrink-0 items-center gap-x-6 border-b border-white/5 px-4 shadow-sm sm:px-6 lg:px-8">
             <button type="button" className="-m-2.5 p-2.5 text-white xl:hidden">
               <span className="sr-only">Open sidebar</span>
             </button>
 
             <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-              <form className="flex flex-1" action="#" method="GET">
+              <div className="flex flex-1">
                 <label htmlFor="search-field" className="sr-only">
                   Search
                 </label>
@@ -381,7 +396,7 @@ export default function Home() {
                     className="flex justify-center items-center w-full h-full border-0"
                   />
                 </div>
-              </form>
+              </div>
             </div>
           </div>
 
@@ -389,6 +404,38 @@ export default function Home() {
             <header>
               {/* Stats */}
 
+              <div className="flex justify-between items-center p-4">
+                <h1 className="text-xl font-bold text-white">Stats</h1>
+                {/* <Button variant="outline">generate graph</Button> */}
+
+                {mounted ? (
+                  <AlertDialog>
+                    <AlertDialogTrigger>
+                      <Button variant="outline">generate graph</Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Are you absolutely sure?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently
+                          delete your account and remove your data from our
+                          servers.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction>Continue</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                ) : (
+                  <Button variant="outline" disabled>
+                    generate graph
+                  </Button>
+                )}
+              </div>
               <div className="grid grid-cols-1  sm:grid-cols-2 lg:grid-cols-4">
                 {stats.map((stat, statIdx) => (
                   <div
@@ -434,7 +481,7 @@ export default function Home() {
                 <Plus className="h-5 w-5 mr-2 order-first" />
                 <span className="mx-auto">Create a new log</span>
                 <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-                  <span className="text-xs">⌘</span>J
+                  <span className="text-xs">⌘</span>K
                 </kbd>
               </Button>
 
@@ -584,17 +631,7 @@ export default function Home() {
                   <>
                     <CommandList>
                       <CommandEmpty>No results found.</CommandEmpty>
-                      <CommandGroup heading="Return">
-                        <CommandItem
-                          onSelect={() => {
-                            setInitialCommand(true);
-                            setLogCommand(false);
-                          }}
-                        >
-                          <CornerDownLeft className="mr-2 h-4 w-4" />
-                          Main Menu
-                        </CommandItem>
-                      </CommandGroup>
+
                       <CommandSeparator />
                     </CommandList>
                     <CommandList>
@@ -618,6 +655,35 @@ export default function Home() {
                             }}
                           />
                         </CommandItem>
+                        <CommandItem
+                          onSelect={(e) => {
+                            //   @ts-ignore
+                            createLog(e);
+                            setCategoryCommand(false);
+                            setLogCommand(false);
+                            setInitialCommand(true);
+                            setOpen(false);
+                          }}
+                          disabled={logText === ""}
+                          //   className="mb-1.5"
+                          //   classname cursor not allowed if logText is empty
+                          className={`mb-1.5 ${
+                            logText === "" ? "cursor-not-allowed" : ""
+                          }`}
+                        >
+                          <BookUp className="mr-2 h-4 w-4" />
+                          Submit
+                        </CommandItem>
+                        <CommandItem
+                          onSelect={() => {
+                            setInitialCommand(true);
+                            setLogCommand(false);
+                          }}
+                          className="mb-1.5"
+                        >
+                          <CornerDownLeft className="mr-2 h-4 w-4" />
+                          Main Menu
+                        </CommandItem>
                       </CommandGroup>
                     </CommandList>
                   </>
@@ -627,22 +693,24 @@ export default function Home() {
                   <>
                     <CommandList>
                       <CommandEmpty>No results found.</CommandEmpty>
-                      <CommandGroup heading="Return">
-                        <CommandItem
-                          onSelect={() => {
-                            setInitialCommand(true);
-                            setCategoryCommand(false);
-                          }}
-                        >
-                          <CornerDownLeft className="mr-2 h-4 w-4" />
-                          Main Menu
-                        </CommandItem>
-                      </CommandGroup>
+
                       <CommandSeparator />
                     </CommandList>
                     <CommandList>
                       <CommandGroup heading="Create a new category">
-                        <CommandItem>
+                        {/* <Input
+                            onChange={handleInputChange}
+                            placeholder="Ex... Design"
+                            value={inputText}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                createCategory(e);
+                                setInitialCommand(true);
+                                setCategoryCommand(false);
+                              }
+                            }}
+                          /> */}
+                        <div className="flex w-full mt-4 mb-4 items-center space-x-2">
                           <Input
                             onChange={handleInputChange}
                             placeholder="Ex... Design"
@@ -654,7 +722,30 @@ export default function Home() {
                                 setCategoryCommand(false);
                               }
                             }}
-                          />
+                          />{" "}
+                          <Button
+                            type="submit"
+                            variant="outline"
+                            disabled={inputText === ""}
+                            onClick={(e) => {
+                              createCategory(e);
+                              setInitialCommand(true);
+                              setCategoryCommand(false);
+                            }}
+                          >
+                            Create
+                          </Button>
+                        </div>
+
+                        <CommandItem
+                          onSelect={() => {
+                            setInitialCommand(true);
+                            setCategoryCommand(false);
+                          }}
+                          className="mb-1.5"
+                        >
+                          <CornerDownLeft className="mr-2 h-4 w-4" />
+                          Main Menu
                         </CommandItem>
                       </CommandGroup>
                     </CommandList>
@@ -711,6 +802,11 @@ export default function Home() {
                                     <div className="flex space-x-2">
                                       <Badge>{log.category}</Badge>
                                       <Badge>{log.size} KB</Badge>
+                                      <Badge>
+                                        {log.createdTime
+                                          ? log.createdTime.toLocaleString()
+                                          : ""}
+                                      </Badge>
                                     </div>
                                   </SheetTitle>
                                   <SheetDescription>
@@ -761,7 +857,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 z-50 border-t">
+      <div className="fixed bg-background bottom-0 left-0 right-0 p-4 z-50 border-t">
         <div className="mx-auto max-w-2xl">
           <TooltipProvider>
             <Tooltip>
