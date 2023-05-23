@@ -1,8 +1,6 @@
 "use client";
 
-import React, { CSSProperties } from "react";
-import * as d3 from "d3";
-import { format } from "date-fns";
+import React from "react";
 
 import Navbar from "@/components/navbar";
 
@@ -75,17 +73,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import TableSkeleton from "@/components/skeletons/table-skeleton";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import StatBlock from "@/components/stats";
+import GraphModal from "@/components/graph-modal";
 
 interface TextItem {
   text: string;
@@ -98,173 +87,6 @@ interface LogItem {
   category: string;
   createdTime: string;
   size: number;
-}
-
-function classNames(...classes: any[]) {
-  return classes.filter(Boolean).join(" ");
-}
-
-function Chart({ data }: { data: { value: number; date: Date }[] }) {
-  let xScale = d3
-    .scaleTime()
-    .domain([data[0].date, data[data.length - 1].date])
-    .range([0, 100]);
-  let yScale = d3
-    .scaleLinear()
-    .domain([0, d3.max(data.map((d) => d.value)) ?? 0])
-    .range([100, 0]);
-
-  let line = d3
-    .line<(typeof data)[number]>()
-    .x((d) => xScale(d.date))
-    .y((d) => yScale(d.value));
-
-  let d = line(data);
-
-  if (!d) {
-    return null;
-  }
-
-  return (
-    <div
-      className="@container relative h-full w-full"
-      style={
-        {
-          "--marginTop": "6px",
-          "--marginRight": "8px",
-          "--marginBottom": "25px",
-          "--marginLeft": "25px",
-        } as CSSProperties
-      }
-    >
-      {/* X axis */}
-      <svg
-        className="absolute inset-0
-            h-[calc(100%-var(--marginTop))]
-            w-[calc(100%-var(--marginLeft)-var(--marginRight))]
-            translate-x-[var(--marginLeft)]
-            translate-y-[var(--marginTop)]
-            overflow-visible
-          "
-      >
-        {data.map((day, i) => (
-          <g key={i} className="overflow-visible font-medium text-gray-500">
-            <text
-              x={`${xScale(day.date)}%`}
-              y="100%"
-              textAnchor={
-                i === 0 ? "start" : i === data.length - 1 ? "end" : "middle"
-              }
-              fill="currentColor"
-              className="@sm:inline hidden text-sm"
-            >
-              {format(day.date, "EEE")}
-            </text>
-            <text
-              x={`${xScale(day.date)}%`}
-              y="100%"
-              textAnchor={
-                i === 0 ? "start" : i === data.length - 1 ? "end" : "middle"
-              }
-              fill="currentColor"
-              className="@sm:hidden text-xs"
-            >
-              {format(day.date, "EEEEE")}
-            </text>
-          </g>
-        ))}
-      </svg>
-
-      {/* Y axis */}
-      <svg
-        className="absolute inset-0
-            h-[calc(100%-var(--marginTop)-var(--marginBottom))]
-            translate-y-[var(--marginTop)]
-            overflow-visible
-          "
-      >
-        <g className="translate-x-4">
-          {yScale
-            .ticks(8)
-            .map(yScale.tickFormat(8, "d"))
-            .map((value, i) => (
-              <text
-                key={i}
-                y={`${yScale(+value)}%`}
-                alignmentBaseline="middle"
-                textAnchor="end"
-                className="text-xs tabular-nums text-gray-600"
-                fill="currentColor"
-              >
-                {value}
-              </text>
-            ))}
-        </g>
-      </svg>
-
-      {/* Chart area */}
-      <svg
-        className="absolute inset-0
-            h-[calc(100%-var(--marginTop)-var(--marginBottom))]
-            w-[calc(100%-var(--marginLeft)-var(--marginRight))]
-            translate-x-[var(--marginLeft)]
-            translate-y-[var(--marginTop)]
-            overflow-visible
-          "
-      >
-        <svg
-          viewBox="0 0 100 100"
-          className="overflow-visible"
-          preserveAspectRatio="none"
-        >
-          {/* Grid lines */}
-          {yScale
-            .ticks(8)
-            .map(yScale.tickFormat(8, "d"))
-            .map((active, i) => (
-              <g
-                transform={`translate(0,${yScale(+active)})`}
-                className="text-gray-700"
-                key={i}
-              >
-                <line
-                  x1={0}
-                  x2={100}
-                  stroke="currentColor"
-                  strokeDasharray="6,5"
-                  strokeWidth={0.5}
-                  vectorEffect="non-scaling-stroke"
-                />
-              </g>
-            ))}
-
-          {/* Line */}
-          <path
-            d={d}
-            fill="none"
-            className="text-gray-600"
-            stroke="currentColor"
-            strokeWidth="2"
-            vectorEffect="non-scaling-stroke"
-          />
-
-          {/* Circles */}
-          {data.map((d) => (
-            <path
-              key={d.date.toString()}
-              d={`M ${xScale(d.date)} ${yScale(d.value)} l 0.0001 0`}
-              vectorEffect="non-scaling-stroke"
-              strokeWidth="8"
-              strokeLinecap="round"
-              fill="none"
-              stroke="currentColor"
-              className="text-gray-400"
-            />
-          ))}
-        </svg>
-      </svg>
-    </div>
-  );
 }
 
 export default function Home() {
@@ -354,17 +176,6 @@ export default function Home() {
       unit: remainingSpace > 0 ? "KB" : "",
     },
   ];
-
-  //   let sales = [
-  //     { date: "2023-04-30T12:00:00.00+00:00", value: 4 },
-  //     { date: "2023-05-01T12:00:00.00+00:00", value: 6 },
-  //     { date: "2023-05-02T12:00:00.00+00:00", value: 8 },
-  //     { date: "2023-05-03T12:00:00.00+00:00", value: 7 },
-  //     { date: "2023-05-04T12:00:00.00+00:00", value: 10 },
-  //     { date: "2023-05-05T12:00:00.00+00:00", value: 12 },
-  //     { date: "2023-05-06T12:00:00.00+00:00", value: 4 },
-  //   ];
-  //   let data = sales.map((d) => ({ ...d, date: new Date(d.date) }));
 
   let logsByDay = {};
 
@@ -606,87 +417,24 @@ export default function Home() {
 
           <main>
             <header>
-              {/* Stats */}
-
               <div className="flex justify-between items-center p-4">
                 <h1 className="text-xl font-bold text-white">Stats</h1>
 
                 {mounted ? (
-                  <AlertDialog>
-                    <AlertDialogTrigger>
-                      <Button variant="outline">
-                        <BarChart4 className="w-6 h-6" />
-                        Analytics
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          Log Analytics | Work in progress
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          <div className="grid grid-cols-2 gap-x-4 gap-y-12 p-4">
-                            <div className="col-span-2 h-60">
-                              {/*   @ts-ignore */}
-                              <Chart data={data} />
-                            </div>
-                            <div className="h-40">
-                              {/*   @ts-ignore */}
-                              <Chart data={data} />
-                            </div>
-                            <div className="h-40">
-                              {/*   @ts-ignore */}
-                              <Chart data={data} />
-                            </div>
-                          </div>
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Close</AlertDialogCancel>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                  <GraphModal data={data} />
                 ) : (
                   <Button variant="outline" disabled>
-                    generate graph
+                    <BarChart4 className="w-6 h-6 mr-2" />
+                    Analytics
                   </Button>
                 )}
               </div>
-              <div className="grid grid-cols-1  sm:grid-cols-2 lg:grid-cols-4">
-                {stats.map((stat, statIdx) => (
-                  <div
-                    key={stat.name}
-                    className={classNames(
-                      statIdx % 2 === 1
-                        ? "sm:border-l"
-                        : statIdx === 2
-                        ? "lg:border-l"
-                        : "",
-                      "border-t py-6 px-4 sm:px-6 lg:px-8"
-                    )}
-                  >
-                    <p className="text-sm font-medium leading-6 text-gray-400">
-                      {stat.name}
-                    </p>
-                    <div className="mt-2 flex items-baseline gap-x-2">
-                      <div className="text-4xl font-semibold tracking-tight text-primary">
-                        {stat.value}
-                      </div>
-                      {stat.unit ? (
-                        <span className="text-sm text-gray-400">
-                          {stat.unit}
-                        </span>
-                      ) : null}
-                    </div>
-                  </div>
-                ))}
-              </div>
 
-              {/* Progress bar */}
+              {/* @ts-ignore */}
+              <StatBlock stats={stats} />
             </header>
 
-            {/* Activity list */}
-            <div className="border-t  pt-11">
+            <div className="border-t pt-11">
               <Button
                 onClick={() => setOpen(true)}
                 variant="outline"
@@ -881,8 +629,6 @@ export default function Home() {
                             setOpen(false);
                           }}
                           disabled={logText === ""}
-                          //   className="mb-1.5"
-                          //   classname cursor not allowed if logText is empty
                           className={`mb-1.5 ${
                             logText === "" ? "cursor-not-allowed" : ""
                           }`}
@@ -914,18 +660,6 @@ export default function Home() {
                     </CommandList>
                     <CommandList>
                       <CommandGroup heading="Create a new category">
-                        {/* <Input
-                            onChange={handleInputChange}
-                            placeholder="Ex... Design"
-                            value={inputText}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                createCategory(e);
-                                setInitialCommand(true);
-                                setCategoryCommand(false);
-                              }
-                            }}
-                          /> */}
                         <div className="flex w-full mt-4 mb-4 items-center space-x-2">
                           <Input
                             onChange={handleInputChange}
