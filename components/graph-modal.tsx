@@ -33,14 +33,6 @@ export default function GraphModal({ data }: any) {
                 {/*   @ts-ignore */}
                 <Chart data={data} />
               </div>
-              <div className="h-40">
-                {/*   @ts-ignore */}
-                <Chart data={data} />
-              </div>
-              <div className="h-40">
-                {/*   @ts-ignore */}
-                <Chart data={data} />
-              </div>
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>

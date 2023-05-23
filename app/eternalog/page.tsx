@@ -418,7 +418,7 @@ export default function Home() {
           <main>
             <header>
               <div className="flex justify-between items-center p-4">
-                <h1 className="text-xl font-bold text-white">Stats</h1>
+                <h1 className="text-xl font-bold">Stats</h1>
 
                 {mounted ? (
                   <GraphModal data={data} />
