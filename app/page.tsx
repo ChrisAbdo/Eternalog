@@ -1,32 +1,31 @@
 import Link from "next/link";
 import ThemeSwitcher from "@/components/theme-switch";
 import { Button } from "@/components/ui/button";
-import { ArrowBigDown, Brain, Cloud } from "lucide-react";
+import { Brain } from "lucide-react";
 import IntroText from "@/components/landing/intro-text";
 import Footer from "@/components/landing/footer";
 
-const features = [
-  {
-    name: "Instant thought storage",
-    description:
-      "Eternalog allows you to store your thoughts and ideas instantly. All it takes is a few clicks and typing in your thought.",
-    href: "/eternalog",
-  },
-  {
-    name: "Categorize all your thoughts",
-    description:
-      "Put your thoughts into categories to make it easier to find them later. You can also add tags to your thoughts to make them even easier to find.",
-    href: "/eternalog",
-  },
-  {
-    name: "Remains there forever.",
-    description:
-      "The way Eternalog is built allows your thoughts to be stored forever. No need to worry about losing your thoughts, unless you manually delete them.",
-    href: "/eternalog",
-  },
-];
-
 export default function Example() {
+  const features = [
+    {
+      name: "Instant thought storage",
+      description:
+        "Eternalog allows you to store your thoughts and ideas instantly. All it takes is a few clicks and typing in your thought.",
+      href: "/eternalog",
+    },
+    {
+      name: "Categorize all your thoughts",
+      description:
+        "Put your thoughts into categories to make it easier to find them later. You can also add tags to your thoughts to make them even easier to find.",
+      href: "/eternalog",
+    },
+    {
+      name: "Remains there forever.",
+      description:
+        "The way Eternalog is built allows your thoughts to be stored forever. No need to worry about losing your thoughts, unless you manually delete them.",
+      href: "/eternalog",
+    },
+  ];
   return (
     <div>
       <header className="absolute inset-x-0 top-0 z-50">
@@ -80,7 +79,7 @@ export default function Example() {
               <IntroText />
             </div>
             <img
-              src="https://pbs.twimg.com/media/Fw7IYL6XsAIgdZ6?format=jpg&name=large"
+              src="https://pbs.twimg.com/media/Fw7KZeGXoAMc-gM?format=jpg&name=large"
               alt="App screenshot"
               width={2432}
               height={1442}
