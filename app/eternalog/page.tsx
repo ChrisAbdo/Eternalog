@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-
 import Navbar from "@/components/navbar";
 
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,7 @@ import {
   Check,
   CornerDownLeft,
   Info,
+  Lightbulb,
   MoreHorizontal,
   Pen,
   Plus,
@@ -48,15 +48,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import {
   Table,
   TableBody,
@@ -456,7 +448,7 @@ export default function Home() {
                   <span className="sr-only">Create a new log</span>
                   {/* Button Text */}
                   <Plus className="h-5 w-5 mr-2 order-first" />
-                  <span className="mx-auto">Create Log</span>
+                  <span className="mx-auto">Create</span>
                   <kbd className="bg-primary pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded px-1.5 font-mono text-[10px] font-medium opacity-100">
                     <span className="text-xs">⌘</span>K
                   </kbd>
@@ -471,7 +463,7 @@ export default function Home() {
                   <Separator />
                 </div>
 
-                <div className="flex justify-between px-4 mt-4">
+                <div className="flex justify-between space-x-4 px-4 mt-4">
                   <Input
                     onChange={(event) => setQuery(event.target.value)}
                     placeholder="Search for logs..."
@@ -531,7 +523,7 @@ export default function Home() {
                             setCurrentCategory("Thoughts");
                           }}
                         >
-                          <Brain className="mr-2 h-4 w-4" />
+                          <Lightbulb className="mr-2 h-4 w-4" />
                           Thoughts
                         </CommandItem>
                         <CommandItem
@@ -764,139 +756,137 @@ export default function Home() {
                   {filteredTexts.length > 0 ? (
                     filteredTexts.map((log) => (
                       <TableRow key={log.id}>
-                        <Sheet>
-                          <TableCell className="font-medium truncate max-w-[300px]">
-                            {log.text}
-                          </TableCell>
-                          <TableCell>
-                            <Badge>{log.category}</Badge>
-                          </TableCell>
-                          <TableCell>
-                            {/* add the following logic: if it has 3 leading 0s, show it as "<0.01" */}
-                            {log.size < 0.01
-                              ? "<0.01 KB"
-                              : log.size.toFixed(2) + " KB"}
-                          </TableCell>
-                          <TableCell>
-                            <time>
-                              {log.createdTime
-                                ? log.createdTime.toLocaleString()
-                                : ""}
-                            </time>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Sheet>
-                              <SheetTrigger>
-                                {" "}
-                                <Button variant="ghost">
-                                  <BookOpen className="h-5 w-5" />
-                                  <span className="ml-2">View Log</span>
-                                </Button>
-                              </SheetTrigger>
-                              <SheetContent>
-                                <SheetHeader>
-                                  <SheetTitle>View Log</SheetTitle>
-                                  <SheetTitle>
-                                    <div className="flex space-x-2">
-                                      <Badge>{log.category}</Badge>
-                                      <Badge>{log.size} KB</Badge>
-                                      <Badge>
-                                        {log.createdTime
-                                          ? log.createdTime.toLocaleString()
-                                          : ""}
-                                      </Badge>
-                                    </div>
-                                  </SheetTitle>
+                        <TableCell className="font-medium truncate max-w-[300px]">
+                          {log.text}
+                        </TableCell>
+                        <TableCell>
+                          <Badge>{log.category}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          {/* add the following logic: if it has 3 leading 0s, show it as "<0.01" */}
+                          {log.size < 0.01
+                            ? "<0.01 KB"
+                            : log.size.toFixed(2) + " KB"}
+                        </TableCell>
+                        <TableCell>
+                          <time>
+                            {log.createdTime
+                              ? log.createdTime.toLocaleString()
+                              : ""}
+                          </time>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Sheet>
+                            <SheetTrigger>
+                              {" "}
+                              <Button variant="ghost">
+                                <BookOpen className="h-5 w-5" />
+                                <span className="ml-2">View</span>
+                              </Button>
+                            </SheetTrigger>
+                            <SheetContent size="xl">
+                              <SheetHeader>
+                                <SheetTitle>View Log</SheetTitle>
+                                <SheetTitle>
+                                  <div className="flex space-x-2">
+                                    <Badge>{log.category}</Badge>
+                                    <Badge>{log.size} KB</Badge>
+                                    <Badge>
+                                      {log.createdTime
+                                        ? log.createdTime.toLocaleString()
+                                        : ""}
+                                    </Badge>
+                                  </div>
+                                </SheetTitle>
 
-                                  <Separator />
+                                <Separator />
 
-                                  <SheetDescription>
-                                    <ScrollArea className="h-96">
-                                      {renamingId === log.id ? (
-                                        <>
-                                          <Textarea
-                                            className="whitespace-pre-wrap overflow-auto"
-                                            onChange={(e) => {
-                                              setRenamingText(e.target.value);
-                                            }}
-                                            defaultValue={log.text}
-                                          />
+                                <SheetDescription>
+                                  <ScrollArea className="h-96">
+                                    {renamingId === log.id ? (
+                                      <>
+                                        <Textarea
+                                          className="whitespace-pre-wrap overflow-auto"
+                                          onChange={(e) => {
+                                            setRenamingText(e.target.value);
+                                          }}
+                                          defaultValue={log.text}
+                                        />
 
-                                          <Button
-                                            className="w-full mt-4"
-                                            disabled={
-                                              renamingText === null ||
-                                              renamingText === ""
-                                            }
-                                            onClick={() => {
-                                              console.log(
-                                                "renamingText",
-                                                renamingText
-                                              );
-                                              renameLogItem(
-                                                log.id,
-                                                // @ts-ignore
-                                                renamingText
-                                              );
-
+                                        <Button
+                                          className="w-full mt-4"
+                                          disabled={
+                                            renamingText === null ||
+                                            renamingText === ""
+                                          }
+                                          onClick={() => {
+                                            console.log(
+                                              "renamingText",
+                                              renamingText
+                                            );
+                                            renameLogItem(
+                                              log.id,
                                               // @ts-ignore
-                                              setRenamingId("");
-                                            }}
-                                          >
-                                            <Check className="h-5 w-5 mr-2" />
-                                            Save
-                                          </Button>
+                                              renamingText
+                                            );
 
-                                          <Button
-                                            variant="outline"
-                                            className="w-full mt-4"
-                                            onClick={() => {
-                                              // @ts-ignore
-                                              setRenamingId("");
-                                              setRenamingText("");
-                                            }}
-                                          >
-                                            <X className="h-5 w-5 mr-2" />
-                                            Cancel
-                                          </Button>
-                                        </>
-                                      ) : (
-                                        <pre className="whitespace-pre-wrap overflow-auto">
-                                          {log.text}
-                                        </pre>
-                                      )}
-                                    </ScrollArea>
+                                            // @ts-ignore
+                                            setRenamingId("");
+                                          }}
+                                        >
+                                          <Check className="h-5 w-5 mr-2" />
+                                          Save
+                                        </Button>
 
-                                    <div className="mt-4">
-                                      <Separator />
-                                    </div>
+                                        <Button
+                                          variant="ghost"
+                                          className="w-full mt-4"
+                                          onClick={() => {
+                                            // @ts-ignore
+                                            setRenamingId("");
+                                            setRenamingText("");
+                                          }}
+                                        >
+                                          <X className="h-5 w-5 mr-2" />
+                                          Cancel
+                                        </Button>
+                                      </>
+                                    ) : (
+                                      <pre className="whitespace-pre-wrap overflow-auto">
+                                        {log.text}
+                                      </pre>
+                                    )}
+                                  </ScrollArea>
 
-                                    <div className="flex justify-between">
-                                      <Button
-                                        variant="outline"
-                                        className="mt-4"
-                                        onClick={() => {
-                                          setRenamingId(log.id);
-                                        }}
-                                      >
-                                        <Pen className="h-5 w-5 mr-2" />
-                                        Edit Log
-                                      </Button>
-                                      <Button
-                                        variant="destructive"
-                                        className="mt-4"
-                                        onClick={() => deleteLogItem(log.id)}
-                                      >
-                                        <Trash className="h-5 w-5 mr-2" />
-                                        Delete Log
-                                      </Button>
-                                    </div>
-                                  </SheetDescription>
-                                </SheetHeader>
-                              </SheetContent>
-                            </Sheet>
-                          </TableCell>
-                        </Sheet>
+                                  <div className="mt-4">
+                                    <Separator />
+                                  </div>
+
+                                  <div className="flex justify-between">
+                                    <Button
+                                      variant="outline"
+                                      className="mt-4"
+                                      onClick={() => {
+                                        setRenamingId(log.id);
+                                      }}
+                                    >
+                                      <Pen className="h-5 w-5 mr-2" />
+                                      Edit Log
+                                    </Button>
+                                    <Button
+                                      variant="destructive"
+                                      className="mt-4"
+                                      onClick={() => deleteLogItem(log.id)}
+                                    >
+                                      <Trash className="h-5 w-5 mr-2" />
+                                      Delete Log
+                                    </Button>
+                                  </div>
+                                </SheetDescription>
+                              </SheetHeader>
+                            </SheetContent>
+                          </Sheet>
+                        </TableCell>
                       </TableRow>
                     ))
                   ) : (

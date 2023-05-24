@@ -3,13 +3,6 @@ import { Button } from "@/components/ui/button";
 import { BookOpenCheck } from "lucide-react";
 import Link from "next/link";
 
-const navigation = [
-  { name: "Product", href: "#" },
-  { name: "Features", href: "#" },
-  { name: "Marketplace", href: "#" },
-  { name: "Company", href: "#" },
-];
-
 export default function Example() {
   return (
     <div className="">
@@ -33,17 +26,7 @@ export default function Example() {
               <span className="sr-only">Open main menu</span>
             </button>
           </div>
-          <div className="hidden lg:flex lg:gap-x-12">
-            {navigation.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className="text-sm font-semibold leading-6 text-primary hover:text-primary/80"
-              >
-                {item.name}
-              </a>
-            ))}
-          </div>
+
           <div className="flex flex-1 justify-end space-x-4">
             <Link href="/eternalog">
               <Button variant="default">Launch App</Button>
