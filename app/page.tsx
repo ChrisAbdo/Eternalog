@@ -1,6 +1,6 @@
 import ThemeSwitcher from "@/components/theme-switch";
 import { Button } from "@/components/ui/button";
-import { BookOpenCheck } from "lucide-react";
+import { BookOpenCheck, Brain } from "lucide-react";
 import Link from "next/link";
 
 export default function Example() {
@@ -12,10 +12,11 @@ export default function Example() {
           aria-label="Global"
         >
           <div className="flex lg:flex-1">
-            <Link href="/" className="flex items-center -m-1.5 p-1.5">
-              <span className="sr-only">Your Company</span>
-              <BookOpenCheck className="h-6 w-auto" />
-              <h1 className="ml-2 text-xl font-bold text-primary">Eternalog</h1>
+            <Link href="/" className="flex items-center -m-1.5 p-1.5 text-2xl">
+              <div className="bg-primary rounded-full p-0.5 mr-2">
+                <Brain className="h-6 w-6 text-secondary " />
+              </div>
+              Eternalog
             </Link>
           </div>
           <div className="flex lg:hidden">

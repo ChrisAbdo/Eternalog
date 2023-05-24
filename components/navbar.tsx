@@ -15,11 +15,7 @@ interface NavbarProps {
   createCategory: any;
 }
 
-export default function Navbar({
-  savedLogs,
-  onSelect,
-  createCategory,
-}: NavbarProps) {
+export default function Navbar() {
   return (
     <header className="border-b">
       <nav
@@ -27,20 +23,12 @@ export default function Navbar({
         aria-label="Global"
       >
         <div className="flex items-center space-x-6">
-          <Link href="/" className="flex items-center -m-1.5 p-1.5 text-xl">
-            <Brain className="h-6 w-6 mr-2 text-primary" />
+          <Link href="/" className="flex items-center -m-1.5 p-1.5 text-2xl">
+            <div className="bg-primary rounded-full p-0.5 mr-2">
+              <Brain className="h-6 w-6 text-secondary " />
+            </div>
             Eternalog
           </Link>
-
-          {/* hidden on small screen */}
-          <div className="hidden lg:block">
-            <TeamSwitcher
-              savedLogs={savedLogs}
-              // @ts-ignore
-              onSelect={onSelect}
-              createCategory={createCategory}
-            />
-          </div>
         </div>
         <div className="flex lg:hidden">
           <button

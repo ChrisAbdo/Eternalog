@@ -107,7 +107,6 @@ export default function TeamSwitcher({
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            size="sm"
             role="combobox"
             aria-expanded={open}
             aria-label="Select a team"

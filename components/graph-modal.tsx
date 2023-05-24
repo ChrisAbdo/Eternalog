@@ -19,7 +19,7 @@ export default function GraphModal({ data }: any) {
   return (
     <AlertDialog>
       <AlertDialogTrigger>
-        <Button variant="outline">
+        <Button variant="outline" className="hidden sm:flex">
           <BarChart4 className="w-6 h-6 mr-2" />
           Analytics
         </Button>
