@@ -26,14 +26,12 @@ export default function Navbar({
         className="mx-auto flex items-center justify-between p-6 lg:px-8"
         aria-label="Global"
       >
-        <div className="flex items-center">
+        <div className="flex items-center space-x-6">
           <Link href="/" className="flex items-center -m-1.5 p-1.5 text-xl">
             <Brain className="h-6 w-6 mr-2 text-primary" />
             Eternalog
           </Link>
-          <div className="hidden lg:block">
-            <h1 className="text-xl ml-6 mr-6 text-muted-foreground">/</h1>
-          </div>
+
           {/* hidden on small screen */}
           <div className="hidden lg:block">
             <TeamSwitcher

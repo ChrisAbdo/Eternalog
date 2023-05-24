@@ -78,6 +78,7 @@ import StatBlock from "@/components/stats";
 import GraphModal from "@/components/graph-modal";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface TextItem {
   text: string;
@@ -145,7 +146,7 @@ export default function Home() {
         savedLogs && savedLogs.length > 0 ? (
           savedLogs.length
         ) : (
-          <Skeleton className="w-[100px] h-[20px] rounded-md" />
+          <Skeleton className="w-[100px] h-[30px] rounded-md" />
         ),
     },
     {
@@ -154,7 +155,7 @@ export default function Home() {
         savedTexts && savedTexts.length > 0 ? (
           savedTexts.length
         ) : (
-          <Skeleton className="w-[100px] h-[20px] rounded-md" />
+          <Skeleton className="w-[100px] h-[30px] rounded-md" />
         ),
     },
     {
@@ -163,7 +164,7 @@ export default function Home() {
         useStoragePercentage && useStoragePercentage > 0 ? (
           useStoragePercentage + "%"
         ) : (
-          <Skeleton className="w-[100px] h-[20px] rounded-md" />
+          <Skeleton className="w-[100px] h-[30px] rounded-md" />
         ),
       unit: useStoragePercentage > 0 ? "%" : "",
     },
@@ -173,7 +174,7 @@ export default function Home() {
         remainingSpace && remainingSpace > 0 ? (
           remainingSpace
         ) : (
-          <Skeleton className="w-[100px] h-[20px] rounded-md" />
+          <Skeleton className="w-[100px] h-[25px] rounded-md" />
         ),
 
       unit: remainingSpace > 0 ? "KB" : "",
@@ -321,6 +322,23 @@ export default function Home() {
     });
   }
 
+  function renameLogItem(id: number) {
+    let updatedLogs = savedLogs.map((logItem) =>
+      logItem.id === id ? { ...logItem, text: renamingText || "" } : logItem
+    );
+
+    localStorage.setItem("logs", JSON.stringify(updatedLogs));
+
+    setSavedLogs(updatedLogs);
+
+    setRenamingText(null);
+    setRenamingId(null);
+
+    toast({
+      title: "Log renamed",
+    });
+  }
+
   function deleteTextItem(id: number) {
     let categoryNameToDelete =
       savedTexts.find((textItem) => textItem.id === id)?.text || "";
@@ -449,6 +467,7 @@ export default function Home() {
                     autoComplete="off"
                     className="flex justify-center items-center max-w-[25rem]"
                   />
+
                   {mounted ? (
                     <GraphModal data={data} />
                   ) : (
@@ -530,8 +549,7 @@ export default function Home() {
                                         onChange={(e) =>
                                           setRenamingText(e.target.value)
                                         }
-                                        //   onBlur={() => renameTextItem(text.id)}
-                                        autoFocus
+                                        autoFocus={true}
                                       />
                                       <Button
                                         disabled={renamingText === null}
@@ -772,8 +790,70 @@ export default function Home() {
                                       </Badge>
                                     </div>
                                   </SheetTitle>
+
+                                  <Separator />
+
                                   <SheetDescription>
-                                    {log.text}
+                                    <ScrollArea className="h-96">
+                                      {renamingId === log.id ? (
+                                        <Textarea
+                                          className="whitespace-pre-wrap overflow-auto"
+                                          onChange={(e) => {
+                                            setRenamingText(e.target.value);
+                                          }}
+                                          defaultValue={log.text}
+                                          // value={log.text}
+                                          // the value is the text that is being renamed
+
+                                          onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                              renameLogItem(
+                                                log.id,
+                                                // @ts-ignore
+                                                renamingText
+                                              );
+                                              // @ts-ignore
+                                              setRenamingId("");
+                                            }
+                                          }}
+                                          // when closed, show the original text
+                                          onBlur={() => {
+                                            // @ts-ignore
+                                            setRenamingId("");
+                                            setRenamingText(log.text);
+                                          }}
+                                        />
+                                      ) : (
+                                        <pre className="whitespace-pre-wrap overflow-auto">
+                                          {log.text}
+                                        </pre>
+                                      )}
+                                    </ScrollArea>
+
+                                    <div className="mt-4">
+                                      <Separator />
+                                    </div>
+
+                                    <div className="flex justify-between">
+                                      <Button
+                                        variant="outline"
+                                        className="mt-4"
+                                        onClick={() => {
+                                          setRenamingId(log.id);
+                                        }}
+                                      >
+                                        <Pen className="h-5 w-5 mr-2" />
+                                        Edit Log
+                                      </Button>
+                                      <Button
+                                        variant="destructive"
+                                        className="mt-4"
+                                        onClick={() => deleteLogItem(log.id)}
+                                      >
+                                        <Trash className="h-5 w-5 mr-2" />
+                                        Delete Log
+                                      </Button>
+                                    </div>
                                   </SheetDescription>
                                 </SheetHeader>
                               </SheetContent>
