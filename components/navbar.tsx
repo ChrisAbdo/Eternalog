@@ -21,27 +21,6 @@ export default function Navbar({
   createCategory,
 }: NavbarProps) {
   return (
-    // <div className="border-b">
-    //   <div className="flex h-16 items-center px-4">
-    // <Link href="/" className="flex items-center -m-1.5 p-1.5">
-    //   <Brain className="h-6 w-6 mr-2 text-primary" />
-    //   Eternalog
-    // </Link>
-    //     <h1 className="ml-6 mr-6 text-muted-foreground">/</h1>
-    //     {/* @ts-ignore */}
-    // <TeamSwitcher
-    //   savedLogs={savedLogs}
-    //   // @ts-ignore
-    //   onSelect={onSelect}
-    //   createCategory={createCategory}
-    // />
-
-    //     <div className="ml-auto flex items-center space-x-2">
-    // <ThemeSwitcher />
-    // <UserNav />
-    //     </div>
-    //   </div>
-    // </div>
     <header className="border-b">
       <nav
         className="mx-auto flex items-center justify-between p-6 lg:px-8"
@@ -52,13 +31,18 @@ export default function Navbar({
             <Brain className="h-6 w-6 mr-2 text-primary" />
             Eternalog
           </Link>
-          <h1 className="text-xl ml-6 mr-6 text-muted-foreground">/</h1>
-          <TeamSwitcher
-            savedLogs={savedLogs}
-            // @ts-ignore
-            onSelect={onSelect}
-            createCategory={createCategory}
-          />
+          <div className="hidden lg:block">
+            <h1 className="text-xl ml-6 mr-6 text-muted-foreground">/</h1>
+          </div>
+          {/* hidden on small screen */}
+          <div className="hidden lg:block">
+            <TeamSwitcher
+              savedLogs={savedLogs}
+              // @ts-ignore
+              onSelect={onSelect}
+              createCategory={createCategory}
+            />
+          </div>
         </div>
         <div className="flex lg:hidden">
           <button

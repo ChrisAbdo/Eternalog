@@ -77,6 +77,7 @@ import TableSkeleton from "@/components/skeletons/table-skeleton";
 import StatBlock from "@/components/stats";
 import GraphModal from "@/components/graph-modal";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 
 interface TextItem {
   text: string;
@@ -144,7 +145,7 @@ export default function Home() {
         savedLogs && savedLogs.length > 0 ? (
           savedLogs.length
         ) : (
-          <Skeleton className="w-[100px] h-[40px] rounded-md" />
+          <Skeleton className="w-[100px] h-[20px] rounded-md" />
         ),
     },
     {
@@ -153,16 +154,16 @@ export default function Home() {
         savedTexts && savedTexts.length > 0 ? (
           savedTexts.length
         ) : (
-          <Skeleton className="w-[100px] h-[40px] rounded-md" />
+          <Skeleton className="w-[100px] h-[20px] rounded-md" />
         ),
     },
     {
       name: "Storage used",
       value:
         useStoragePercentage && useStoragePercentage > 0 ? (
-          useStoragePercentage
+          useStoragePercentage + "%"
         ) : (
-          <Skeleton className="w-[100px] h-[40px] rounded-md" />
+          <Skeleton className="w-[100px] h-[20px] rounded-md" />
         ),
       unit: useStoragePercentage > 0 ? "%" : "",
     },
@@ -172,7 +173,7 @@ export default function Home() {
         remainingSpace && remainingSpace > 0 ? (
           remainingSpace
         ) : (
-          <Skeleton className="w-[150px] h-[40px] rounded-md" />
+          <Skeleton className="w-[100px] h-[20px] rounded-md" />
         ),
 
       unit: remainingSpace > 0 ? "KB" : "",
@@ -407,97 +408,60 @@ export default function Home() {
           savedLogs={savedLogs}
           onSelect={(selectedTeam) => {
             setQuery(selectedTeam.label);
-            console.log(
-              `Selected category from grandparent component: ${selectedTeam.label}`
-            );
           }}
           createCategory={createCategory}
         />
 
         <div>
-          {/* Sticky search header */}
-          {/* <div className="sticky top-0 z-50 bg-background flex h-16 shrink-0 items-center gap-x-6 border-b border-white/5 px-4 shadow-sm sm:px-6 lg:px-8">
-            <button type="button" className="-m-2.5 p-2.5 text-white xl:hidden">
-              <span className="sr-only">Open sidebar</span>
-            </button>
-
-            <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-              <div className="flex flex-1">
-                <label htmlFor="search-field" className="sr-only">
-                  Search
-                </label>
-                <div className="relative w-full">
-                  <Input
-                    onChange={(event) => setQuery(event.target.value)}
-                    placeholder="Search for logs..."
-                    type="search"
-                    name="search"
-                    autoComplete="off"
-                    className="flex justify-center items-center w-full h-full border-0"
-                  />
-                </div>
-              </div>
-            </div>
-          </div> */}
-
           <main>
             <header>
-              <div className="flex justify-between items-center p-4">
-                <h1 className="text-xl font-bold">Stats</h1>
-
-                {mounted ? (
-                  <GraphModal data={data} />
-                ) : (
-                  <Button variant="outline" disabled>
-                    <BarChart4 className="w-6 h-6 mr-2" />
-                    Analytics
-                  </Button>
-                )}
+              <div className="flex justify-between items-center p-4 mb-2">
+                <h1 className="text-xl">Logs</h1>
+                <Button
+                  onClick={() => setOpen(true)}
+                  variant="default"
+                  className="w-full flex items-center md:max-w-[25rem] max-w-[10rem]"
+                >
+                  <span className="sr-only">Create a new log</span>
+                  {/* Button Text */}
+                  <Plus className="h-5 w-5 mr-2 order-first" />
+                  <span className="mx-auto">Create Log</span>
+                  <kbd className="bg-primary pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded px-1.5 font-mono text-[10px] font-medium opacity-100">
+                    <span className="text-xs">⌘</span>K
+                  </kbd>
+                </Button>
               </div>
 
-              {/* @ts-ignore */}
-              <StatBlock stats={stats} />
-            </header>
-            <div className="sticky top-0 z-50 bg-background flex h-16 shrink-0 items-center gap-x-6 border-b border-t px-4 shadow-sm sm:px-6 lg:px-8">
-              <button
-                type="button"
-                className="-m-2.5 p-2.5 text-white xl:hidden"
-              >
-                <span className="sr-only">Open sidebar</span>
-              </button>
+              <div>
+                {/* @ts-ignore */}
+                <StatBlock stats={stats} />
 
-              <div className="flex flex-1">
-                <label htmlFor="search-field" className="sr-only">
-                  Search
-                </label>
-                <div className="relative w-full flex items-center">
-                  <Search className="mr-2" />
+                <div className="mt-4 px-4">
+                  <Separator />
+                </div>
+
+                <div className="flex justify-between px-4 mt-4">
                   <Input
                     onChange={(event) => setQuery(event.target.value)}
                     placeholder="Search for logs..."
                     type="search"
                     name="search"
                     autoComplete="off"
-                    className="flex justify-center items-center w-full h-full border-0"
+                    className="flex justify-center items-center max-w-[25rem]"
                   />
+                  {mounted ? (
+                    <GraphModal data={data} />
+                  ) : (
+                    <Button variant="outline" disabled>
+                      <BarChart4 className="w-6 h-6 mr-2" />
+                      Analytics
+                    </Button>
+                  )}
                 </div>
               </div>
-            </div>
-            <div className="pt-11">
-              <Button
-                onClick={() => setOpen(true)}
-                variant="default"
-                className="w-full flex items-center mx-auto max-w-[25rem]"
-              >
-                <span className="sr-only">Create a new log</span>
-                {/* Button Text */}
-                <Plus className="h-5 w-5 mr-2 order-first" />
-                <span className="mx-auto">Create a new log</span>
-                <kbd className="bg-primary pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded px-1.5 font-mono text-[10px] font-medium opacity-100">
-                  <span className="text-xs">⌘</span>K
-                </kbd>
-              </Button>
+            </header>
 
+            <div>
               <CommandDialog
                 open={open}
                 onOpenChange={() => {
@@ -752,7 +716,7 @@ export default function Home() {
                 )}
               </CommandDialog>
 
-              <div className="mt-4 mb-8" />
+              <div className="mb-4" />
 
               <Table>
                 <TableCaption>A list of your recent logs.</TableCaption>

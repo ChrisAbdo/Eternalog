@@ -146,7 +146,9 @@ export default function TeamSwitcher({
                       src={`https://avatar.vercel.sh/.png`}
                       alt="All"
                     />
-                    <AvatarFallback>SC</AvatarFallback>
+                    <AvatarFallback>
+                      <Brain />
+                    </AvatarFallback>
                   </Avatar>
                   All
                   <Check
@@ -178,7 +180,9 @@ export default function TeamSwitcher({
                           src={`https://avatar.vercel.sh/${team.value}.png`}
                           alt={team.label}
                         />
-                        <AvatarFallback>SC</AvatarFallback>
+                        <AvatarFallback>
+                          <Brain />
+                        </AvatarFallback>
                       </Avatar>
                       {team.label}
                       <Check
