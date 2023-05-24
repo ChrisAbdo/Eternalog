@@ -12,6 +12,7 @@ import {
   BookUp,
   Brain,
   BrainCog,
+  Check,
   CornerDownLeft,
   Info,
   MoreHorizontal,
@@ -19,6 +20,7 @@ import {
   Plus,
   Search,
   Trash,
+  X,
 } from "lucide-react";
 import {
   CommandDialog,
@@ -265,6 +267,7 @@ export default function Home() {
       title: "Category created",
     });
 
+    logRemainingLocalStorageSpace();
     console.log(newTexts);
   }
 
@@ -291,6 +294,10 @@ export default function Home() {
     setLogText("");
 
     logRemainingLocalStorageSpace();
+
+    toast({
+      title: "Log created",
+    });
 
     console.log(newLogs);
   }
@@ -320,6 +327,8 @@ export default function Home() {
     toast({
       title: "Category renamed",
     });
+
+    logRemainingLocalStorageSpace();
   }
 
   function renameLogItem(id: number) {
@@ -337,6 +346,8 @@ export default function Home() {
     toast({
       title: "Log renamed",
     });
+
+    logRemainingLocalStorageSpace();
   }
 
   function deleteTextItem(id: number) {
@@ -368,6 +379,8 @@ export default function Home() {
     let filteredLogs = savedLogs.filter((logItem) => logItem.id !== id);
     localStorage.setItem("logs", JSON.stringify(filteredLogs));
     setSavedLogs(filteredLogs);
+
+    logRemainingLocalStorageSpace();
   }
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>): void {
@@ -736,7 +749,7 @@ export default function Home() {
 
               <div className="mb-4" />
 
-              <Table>
+              <Table className="mb-20">
                 <TableCaption>A list of your recent logs.</TableCaption>
                 <TableHeader>
                   <TableRow>
@@ -744,13 +757,12 @@ export default function Home() {
                     <TableHead>Category</TableHead>
                     <TableHead>Size</TableHead>
                     <TableHead>Created</TableHead>
-                    <TableHead>View</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="text-right">View</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredTexts.length > 0 ? (
-                    filteredTexts.map((log, index) => (
+                    filteredTexts.map((log) => (
                       <TableRow key={log.id}>
                         <Sheet>
                           <TableCell className="font-medium truncate max-w-[300px]">
@@ -759,7 +771,12 @@ export default function Home() {
                           <TableCell>
                             <Badge>{log.category}</Badge>
                           </TableCell>
-                          <TableCell>{log.size}</TableCell>
+                          <TableCell>
+                            {/* add the following logic: if it has 3 leading 0s, show it as "<0.01" */}
+                            {log.size < 0.01
+                              ? "<0.01 KB"
+                              : log.size.toFixed(2) + " KB"}
+                          </TableCell>
                           <TableCell>
                             <time>
                               {log.createdTime
@@ -767,7 +784,7 @@ export default function Home() {
                                 : ""}
                             </time>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="text-right">
                             <Sheet>
                               <SheetTrigger>
                                 {" "}
@@ -796,33 +813,53 @@ export default function Home() {
                                   <SheetDescription>
                                     <ScrollArea className="h-96">
                                       {renamingId === log.id ? (
-                                        <Textarea
-                                          className="whitespace-pre-wrap overflow-auto"
-                                          onChange={(e) => {
-                                            setRenamingText(e.target.value);
-                                          }}
-                                          defaultValue={log.text}
-                                          // value={log.text}
-                                          // the value is the text that is being renamed
+                                        <>
+                                          <Textarea
+                                            className="whitespace-pre-wrap overflow-auto"
+                                            onChange={(e) => {
+                                              setRenamingText(e.target.value);
+                                            }}
+                                            defaultValue={log.text}
+                                          />
 
-                                          onKeyDown={(e) => {
-                                            if (e.key === "Enter") {
+                                          <Button
+                                            className="w-full mt-4"
+                                            disabled={
+                                              renamingText === null ||
+                                              renamingText === ""
+                                            }
+                                            onClick={() => {
+                                              console.log(
+                                                "renamingText",
+                                                renamingText
+                                              );
                                               renameLogItem(
                                                 log.id,
                                                 // @ts-ignore
                                                 renamingText
                                               );
+
                                               // @ts-ignore
                                               setRenamingId("");
-                                            }
-                                          }}
-                                          // when closed, show the original text
-                                          onBlur={() => {
-                                            // @ts-ignore
-                                            setRenamingId("");
-                                            setRenamingText(log.text);
-                                          }}
-                                        />
+                                            }}
+                                          >
+                                            <Check className="h-5 w-5 mr-2" />
+                                            Save
+                                          </Button>
+
+                                          <Button
+                                            variant="outline"
+                                            className="w-full mt-4"
+                                            onClick={() => {
+                                              // @ts-ignore
+                                              setRenamingId("");
+                                              setRenamingText("");
+                                            }}
+                                          >
+                                            <X className="h-5 w-5 mr-2" />
+                                            Cancel
+                                          </Button>
+                                        </>
                                       ) : (
                                         <pre className="whitespace-pre-wrap overflow-auto">
                                           {log.text}
@@ -858,34 +895,6 @@ export default function Home() {
                                 </SheetHeader>
                               </SheetContent>
                             </Sheet>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost">
-                                  <MoreHorizontal className="h-5 w-5" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent className="w-56">
-                                <DropdownMenuLabel>
-                                  Log Actions
-                                </DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuGroup>
-                                  <DropdownMenuItem disabled>
-                                    <Pen className="mr-2 h-4 w-4" />
-                                    <span>Coming Soon!</span>
-                                  </DropdownMenuItem>
-                                  <DropdownMenuSeparator />
-                                  <DropdownMenuItem
-                                    onSelect={() => deleteLogItem(log.id)}
-                                  >
-                                    <Trash className="mr-2 h-4 w-4" />
-                                    <span>Delete</span>
-                                  </DropdownMenuItem>
-                                </DropdownMenuGroup>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
                           </TableCell>
                         </Sheet>
                       </TableRow>

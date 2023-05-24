@@ -16,19 +16,16 @@ export default function TableSkeleton() {
       {Array.from({ length: 5 }).map((_, i) => (
         <TableRow key={i}>
           <TableCell className="font-medium">
-            <Skeleton className="w-[300px] h-[30px] rounded-md" />
+            <Skeleton className="w-[125px] h-[30px] rounded-md" />
           </TableCell>
           <TableCell>
-            <Skeleton className="w-[100px] h-[30px] rounded-full" />
+            <Skeleton className="w-[75px] h-[30px] rounded-full" />
           </TableCell>
           <TableCell>
-            <Skeleton className="w-[100px] h-[30px] rounded-md" />
+            <Skeleton className="w-[75px] h-[30px] rounded-md" />
           </TableCell>
           <TableCell>
-            <Skeleton className="w-[100px] h-[30px] rounded-md" />
-          </TableCell>
-          <TableCell>
-            <Skeleton className="w-[100px] h-[30px] rounded-md" />
+            <Skeleton className="w-[75px] h-[30px] rounded-md" />
           </TableCell>
         </TableRow>
       ))}
