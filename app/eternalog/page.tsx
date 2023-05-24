@@ -747,8 +747,12 @@ export default function Home() {
                   <TableRow>
                     <TableHead>Log Name</TableHead>
                     <TableHead>Category</TableHead>
-                    <TableHead>Size</TableHead>
-                    <TableHead>Created</TableHead>
+                    <TableHead className="hidden sm:table-cell">Size</TableHead>
+
+                    <TableHead className="hidden sm:table-cell">
+                      Created
+                    </TableHead>
+
                     <TableHead className="text-right">View</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -756,25 +760,28 @@ export default function Home() {
                   {filteredTexts.length > 0 ? (
                     filteredTexts.map((log) => (
                       <TableRow key={log.id}>
-                        <TableCell className="font-medium truncate max-w-[300px]">
+                        <TableCell className="font-medium truncate md:max-w-[300px] max-w-[50px]">
                           {log.text}
                         </TableCell>
                         <TableCell>
                           <Badge>{log.category}</Badge>
                         </TableCell>
-                        <TableCell>
+
+                        <TableCell className="hidden sm:sm:table-cell">
                           {/* add the following logic: if it has 3 leading 0s, show it as "<0.01" */}
                           {log.size < 0.01
                             ? "<0.01 KB"
                             : log.size.toFixed(2) + " KB"}
                         </TableCell>
-                        <TableCell>
+
+                        <TableCell className="hidden sm:sm:table-cell">
                           <time>
                             {log.createdTime
                               ? log.createdTime.toLocaleString()
                               : ""}
                           </time>
                         </TableCell>
+
                         <TableCell className="text-right">
                           <Sheet>
                             <SheetTrigger>
