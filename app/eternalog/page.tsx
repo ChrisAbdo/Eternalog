@@ -17,6 +17,7 @@ import {
   MoreHorizontal,
   Pen,
   Plus,
+  Search,
   Trash,
 } from "lucide-react";
 import {
@@ -75,6 +76,7 @@ import {
 import TableSkeleton from "@/components/skeletons/table-skeleton";
 import StatBlock from "@/components/stats";
 import GraphModal from "@/components/graph-modal";
+import { Label } from "@/components/ui/label";
 
 interface TextItem {
   text: string;
@@ -292,11 +294,24 @@ export default function Home() {
   }
 
   function renameTextItem(id: number) {
+    let oldCategoryName =
+      savedTexts.find((textItem) => textItem.id === id)?.text || "";
     let updatedTexts = savedTexts.map((textItem) =>
       textItem.id === id ? { ...textItem, text: renamingText || "" } : textItem
     );
+
+    let updatedLogs = savedLogs.map((logItem) =>
+      logItem.category === oldCategoryName
+        ? { ...logItem, category: renamingText || "" }
+        : logItem
+    );
+
     localStorage.setItem("texts", JSON.stringify(updatedTexts));
+    localStorage.setItem("logs", JSON.stringify(updatedLogs));
+
     setSavedTexts(updatedTexts);
+    setSavedLogs(updatedLogs);
+
     setRenamingText(null);
     setRenamingId(null);
 
@@ -306,12 +321,22 @@ export default function Home() {
   }
 
   function deleteTextItem(id: number) {
+    let categoryNameToDelete =
+      savedTexts.find((textItem) => textItem.id === id)?.text || "";
     let filteredTexts = savedTexts.filter((textItem) => textItem.id !== id);
+    let filteredLogs = savedLogs.filter(
+      (logItem) => logItem.category !== categoryNameToDelete
+    );
+
     localStorage.setItem("texts", JSON.stringify(filteredTexts));
+    localStorage.setItem("logs", JSON.stringify(filteredLogs));
     setSavedTexts(filteredTexts);
+    setSavedLogs(filteredLogs);
+
     toast({
       title: "Category deleted",
     });
+
     if (renamingId === id) {
       setRenamingText(null);
       setRenamingId(null);
@@ -391,7 +416,7 @@ export default function Home() {
 
         <div>
           {/* Sticky search header */}
-          <div className="sticky top-0 z-50 bg-background flex h-16 shrink-0 items-center gap-x-6 border-b border-white/5 px-4 shadow-sm sm:px-6 lg:px-8">
+          {/* <div className="sticky top-0 z-50 bg-background flex h-16 shrink-0 items-center gap-x-6 border-b border-white/5 px-4 shadow-sm sm:px-6 lg:px-8">
             <button type="button" className="-m-2.5 p-2.5 text-white xl:hidden">
               <span className="sr-only">Open sidebar</span>
             </button>
@@ -413,7 +438,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           <main>
             <header>
@@ -433,18 +458,42 @@ export default function Home() {
               {/* @ts-ignore */}
               <StatBlock stats={stats} />
             </header>
+            <div className="sticky top-0 z-50 bg-background flex h-16 shrink-0 items-center gap-x-6 border-b border-t px-4 shadow-sm sm:px-6 lg:px-8">
+              <button
+                type="button"
+                className="-m-2.5 p-2.5 text-white xl:hidden"
+              >
+                <span className="sr-only">Open sidebar</span>
+              </button>
 
-            <div className="border-t pt-11">
+              <div className="flex flex-1">
+                <label htmlFor="search-field" className="sr-only">
+                  Search
+                </label>
+                <div className="relative w-full flex items-center">
+                  <Search className="mr-2" />
+                  <Input
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder="Search for logs..."
+                    type="search"
+                    name="search"
+                    autoComplete="off"
+                    className="flex justify-center items-center w-full h-full border-0"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="pt-11">
               <Button
                 onClick={() => setOpen(true)}
-                variant="outline"
+                variant="default"
                 className="w-full flex items-center mx-auto max-w-[25rem]"
               >
-                <span className="sr-only">Create a new team</span>
+                <span className="sr-only">Create a new log</span>
                 {/* Button Text */}
                 <Plus className="h-5 w-5 mr-2 order-first" />
                 <span className="mx-auto">Create a new log</span>
-                <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                <kbd className="bg-primary pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded px-1.5 font-mono text-[10px] font-medium opacity-100">
                   <span className="text-xs">⌘</span>K
                 </kbd>
               </Button>

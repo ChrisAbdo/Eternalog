@@ -1,6 +1,5 @@
-import { Brain, Github, Linkedin, Star, Twitter } from "lucide-react";
+import { Github, Linkedin, Star, Twitter, UserPlus } from "lucide-react";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,15 +13,32 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function UserNav() {
+  let socials = [
+    {
+      name: "Github",
+      icon: <Github className="mr-2 h-4 w-4" />,
+      link: "https://www.github.com/ChrisAbdo",
+      handle: "@ChrisAbdo",
+    },
+    {
+      name: "Twitter",
+      icon: <Twitter className="mr-2 h-4 w-4" />,
+      link: "https://www.twitter.com/abdo_eth",
+      handle: "@abdo_eth",
+    },
+    {
+      name: "LinkedIn",
+      icon: <Linkedin className="mr-2 h-4 w-4" />,
+      link: "https://www.linkedin.com/in/christopher-abdo",
+      handle: "",
+    },
+  ];
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-8 w-8">
-            <AvatarFallback>
-              <Brain className="h-4 w-4" />
-            </AvatarFallback>
-          </Avatar>
+        <Button variant="ghost">
+          <UserPlus className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
@@ -38,35 +54,18 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem
-            onSelect={() => {
-              window.open("https://www.github.com/ChrisAbdo", "_blank");
-            }}
-          >
-            <Github className="mr-2 h-4 w-4" />
-            <span>Github</span>
-            <DropdownMenuShortcut>ChrisAbdo</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onSelect={() => {
-              window.open("https://www.twitter.com/abdo_eth", "_blank");
-            }}
-          >
-            <Twitter className="mr-2 h-4 w-4" />
-            <span>Twitter</span>
-            <DropdownMenuShortcut>@abdo_eth</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onSelect={() => {
-              window.open(
-                "https://www.linkedin.com/in/christopher-abdo/",
-                "_blank"
-              );
-            }}
-          >
-            <Linkedin className="mr-2 h-4 w-4" />
-            <span>LinkedIn</span>
-          </DropdownMenuItem>
+          {socials.map((social) => (
+            <DropdownMenuItem
+              key={social.name}
+              onSelect={() => {
+                window.open(social.link, "_blank");
+              }}
+            >
+              {social.icon}
+              <span>{social.name}</span>
+              <DropdownMenuShortcut>{social.handle}</DropdownMenuShortcut>
+            </DropdownMenuItem>
+          ))}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem
