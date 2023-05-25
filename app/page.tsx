@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Brain } from "lucide-react";
 import IntroText from "@/components/landing/intro-text";
 import Footer from "@/components/landing/footer";
+import ThemeImg from "@/components/landing/theme-img";
 
 export default function Example() {
   const features = [
@@ -78,13 +79,8 @@ export default function Example() {
             <div className="mx-auto max-w-2xl text-center">
               <IntroText />
             </div>
-            <img
-              src="https://pbs.twimg.com/media/Fw7KZeGXoAMc-gM?format=jpg&name=large"
-              alt="App screenshot"
-              width={2432}
-              height={1442}
-              className="mt-16 rounded-md bg-white/5 shadow-2xl ring-1 ring-white/10 sm:mt-24"
-            />
+
+            <ThemeImg />
 
             <div className="py-24 sm:py-32">
               <div className="mx-auto max-w-7xl px-6 lg:px-8">

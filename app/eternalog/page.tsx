@@ -9,16 +9,13 @@ import {
   BarChart4,
   BookOpen,
   BookUp,
-  Brain,
   BrainCog,
   Check,
   CornerDownLeft,
   Info,
   Lightbulb,
-  MoreHorizontal,
   Pen,
   Plus,
-  Search,
   Trash,
   X,
 } from "lucide-react";
@@ -67,13 +64,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import TableSkeleton from "@/components/skeletons/table-skeleton";
 import StatBlock from "@/components/stats";
 import GraphModal from "@/components/graph-modal";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import TeamSwitcher from "@/components/team-switcher";
+import { CountUp } from "use-count-up";
 
 interface TextItem {
   text: string;
@@ -96,6 +92,7 @@ export default function Home() {
   let [initialCommand, setInitialCommand] = React.useState<boolean>(true);
   let [logCommand, setLogCommand] = React.useState<boolean>(false);
   let [categoryCommand, setCategoryCommand] = React.useState<boolean>(false);
+
   let [categories, setCategories] = React.useState<string[]>([]);
   let [remainingSpace, setRemainingSpace] = React.useState<number>(0);
   let [remainingStoragePercentage, setRemainingStoragePercentage] =
@@ -139,7 +136,7 @@ export default function Home() {
       name: "Number of logs",
       value:
         savedLogs && savedLogs.length > 0 ? (
-          savedLogs.length
+          <CountUp isCounting end={savedLogs.length} duration={3.2} />
         ) : (
           <Skeleton className="w-[100px] h-[30px] rounded-md" />
         ),
@@ -148,7 +145,7 @@ export default function Home() {
       name: "Number of categories",
       value:
         savedTexts && savedTexts.length > 0 ? (
-          savedTexts.length
+          <CountUp isCounting end={savedTexts.length} duration={3.2} />
         ) : (
           <Skeleton className="w-[100px] h-[30px] rounded-md" />
         ),
@@ -157,26 +154,33 @@ export default function Home() {
       name: "Storage used",
       value:
         useStoragePercentage && useStoragePercentage > 0 ? (
-          useStoragePercentage + "%"
+          <>
+            <CountUp isCounting end={useStoragePercentage} duration={3.2} /> %
+          </>
         ) : (
           <Skeleton className="w-[100px] h-[30px] rounded-md" />
         ),
-      unit: useStoragePercentage > 0 ? "%" : "",
     },
     {
       name: "Remaining Storage",
       value:
         remainingSpace && remainingSpace > 0 ? (
-          // remainingSpace + " KB"
-          // can you please format remaining space to have correct commas
-          remainingSpace.toLocaleString() + " KB"
+          <>
+            <CountUp
+              isCounting
+              end={remainingSpace}
+              duration={3.2}
+              formatter={(value) => Number(value).toLocaleString()}
+            />{" "}
+            KB
+          </>
         ) : (
           <Skeleton className="w-[100px] h-[25px] rounded-md" />
         ),
-
-      unit: remainingSpace > 0 ? "KB" : "",
     },
   ];
+
+  const updatedRemainingStorage = remainingSpace.toLocaleString() + " KB";
 
   let logsByDay = {};
 
@@ -435,21 +439,16 @@ export default function Home() {
         <div>
           <main>
             <header>
-              <div className="flex justify-between items-center p-4 mb-2">
+              <div className="flex justify-between items-center p-4">
                 <h1 className="text-xl">Logs</h1>
-                <Button
-                  onClick={() => setOpen(true)}
-                  variant="default"
-                  className="w-full flex items-center md:max-w-[25rem] max-w-[10rem]"
-                >
-                  <span className="sr-only">Create a new log</span>
-                  {/* Button Text */}
-                  <Plus className="h-5 w-5 mr-2 order-first" />
-                  <span className="mx-auto">Create</span>
-                  <kbd className="bg-primary pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded px-1.5 font-mono text-[10px] font-medium opacity-100">
-                    <span className="text-xs">⌘</span>K
-                  </kbd>
-                </Button>
+                {mounted ? (
+                  <GraphModal data={data} />
+                ) : (
+                  <Button variant="outline" disabled>
+                    <BarChart4 className="w-6 h-6 mr-2" />
+                    Analytics
+                  </Button>
+                )}
               </div>
 
               <div>
@@ -460,7 +459,7 @@ export default function Home() {
                   <Separator />
                 </div>
 
-                <div className="flex justify-between space-x-4 px-4 mt-4">
+                <div className="flex flex-col sm:flex-row justify-between space-y-4 sm:space-y-0 sm:space-x-4 px-4 mt-4">
                   <div className="flex items-center space-x-4 w-full">
                     <Input
                       onChange={(event) => setQuery(event.target.value)}
@@ -482,14 +481,19 @@ export default function Home() {
                       createCategory={createCategory}
                     />
                   </div>
-                  {mounted ? (
-                    <GraphModal data={data} />
-                  ) : (
-                    <Button variant="outline" disabled>
-                      <BarChart4 className="w-6 h-6 mr-2" />
-                      Analytics
-                    </Button>
-                  )}
+
+                  <Button
+                    onClick={() => setOpen(true)}
+                    variant="default"
+                    className="w-full flex items-center sm:max-w-[25rem] max-w-full"
+                  >
+                    <span className="sr-only">Create a new log</span>
+                    <Plus className="h-5 w-5 mr-2 order-first" />
+                    <span className="mx-auto">Create</span>
+                    <kbd className="bg-primary pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded px-1.5 font-mono text-[10px] font-medium opacity-100">
+                      <span className="text-xs">⌘</span>K
+                    </kbd>
+                  </Button>
                 </div>
               </div>
             </header>
@@ -738,6 +742,7 @@ export default function Home() {
                             setCategoryCommand(false);
                           }}
                           className="mb-1.5"
+                          autoFocus={false}
                         >
                           <CornerDownLeft className="mr-2 h-4 w-4" />
                           Main Menu
