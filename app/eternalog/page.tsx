@@ -1,77 +1,36 @@
-"use client";
+'use client';
 
-import React from "react";
-import Navbar from "@/components/navbar";
-import { motion } from "framer-motion";
+import React from 'react';
+import Navbar from '@/components/navbar';
 
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
-import {
-  BarChart4,
-  BookOpen,
-  BookUp,
-  BrainCog,
-  Check,
-  CornerDownLeft,
-  Info,
-  Lightbulb,
-  Pen,
-  Plus,
-  Trash,
-  X,
-} from "lucide-react";
-import {
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-} from "@/components/ui/command";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
+import { BarChart4, Plus } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import StatBlock from "@/components/stats";
-import GraphModal from "@/components/graph-modal";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import TeamSwitcher from "@/components/team-switcher";
-import { CountUp } from "use-count-up";
-import TableSkeleton from "@/components/skeletons/table-skeleton";
+import { Skeleton } from '@/components/ui/skeleton';
+
+import StatBlock from '@/components/stats';
+
+import GraphModal from '@/components/graph-modal';
+
+import { Separator } from '@/components/ui/separator';
+import TeamSwitcher from '@/components/team-switcher';
+import { CountUp } from 'use-count-up';
+
+import dynamic from 'next/dynamic';
+
+import CategoryCommandDialog from '@/components/command/category-command';
+import LogCommandDialog from '@/components/command/log-command';
+import InitialCommandDialog from '@/components/command/initial-command';
+
+import TableData from '@/components/table/table-data';
+
+const Footer = dynamic(() => import('@/components/footer'), {
+  ssr: false,
+});
+
+import CommandDialogWrapper from '@/components/command/command-dialog';
 
 interface TextItem {
   text: string;
@@ -102,12 +61,12 @@ export default function Home() {
   let [useStoragePercentage, setUsedStoragePercentage] =
     React.useState<number>(0);
 
-  let [currentCategory, setCurrentCategory] = React.useState<string>("");
+  let [currentCategory, setCurrentCategory] = React.useState<string>('');
 
   let [open, setOpen] = React.useState(false);
 
-  let [inputText, setInputText] = React.useState<string>("");
-  let [logText, setLogText] = React.useState<string>("");
+  let [inputText, setInputText] = React.useState<string>('');
+  let [logText, setLogText] = React.useState<string>('');
 
   let [savedTexts, setSavedTexts] = React.useState<TextItem[]>([]);
   let [savedLogs, setSavedLogs] = React.useState<LogItem[]>([]);
@@ -115,19 +74,19 @@ export default function Home() {
   let [renamingText, setRenamingText] = React.useState<string | null>(null);
   let [renamingId, setRenamingId] = React.useState<number | null>(null);
 
-  let [selectedCategory, setSelectedCategory] = React.useState<string>("");
-  let [query, setQuery] = React.useState<string>("");
+  let [selectedCategory, setSelectedCategory] = React.useState<string>('');
+  let [query, setQuery] = React.useState<string>('');
 
   let filteredTexts = savedLogs.filter((log) => {
     if (
-      query !== "" &&
+      query !== '' &&
       // !textItem.text.toLowerCase().includes(query.toLowerCase())
       !log.text.toLowerCase().includes(query.toLowerCase()) &&
       !log.category.toLowerCase().includes(query.toLowerCase())
     ) {
       return false;
     }
-    if (selectedCategory !== "" && !log.category.includes(selectedCategory)) {
+    if (selectedCategory !== '' && !log.category.includes(selectedCategory)) {
       return false;
     }
     return true;
@@ -135,7 +94,7 @@ export default function Home() {
 
   let stats = [
     {
-      name: "Number of logs",
+      name: 'Number of logs',
       value:
         savedLogs && savedLogs.length > 0 ? (
           <CountUp isCounting end={savedLogs.length} duration={3.2} />
@@ -144,7 +103,7 @@ export default function Home() {
         ),
     },
     {
-      name: "Number of categories",
+      name: 'Number of categories',
       value:
         savedTexts && savedTexts.length > 0 ? (
           <CountUp isCounting end={savedTexts.length} duration={3.2} />
@@ -153,7 +112,7 @@ export default function Home() {
         ),
     },
     {
-      name: "Storage used",
+      name: 'Storage used',
       value:
         useStoragePercentage && useStoragePercentage > 0 ? (
           <>
@@ -164,7 +123,7 @@ export default function Home() {
         ),
     },
     {
-      name: "Remaining Storage",
+      name: 'Remaining Storage',
       value:
         remainingSpace && remainingSpace > 0 ? (
           <>
@@ -173,7 +132,7 @@ export default function Home() {
               end={remainingSpace}
               duration={3.2}
               formatter={(value) => Number(value).toLocaleString()}
-            />{" "}
+            />{' '}
             KB
           </>
         ) : (
@@ -181,8 +140,6 @@ export default function Home() {
         ),
     },
   ];
-
-  const updatedRemainingStorage = remainingSpace.toLocaleString() + " KB";
 
   let logsByDay = {};
 
@@ -215,17 +172,17 @@ export default function Home() {
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key === "k" && e.metaKey) {
+      if ((e.key === 'k' && e.metaKey) || (e.key === 'k' && e.ctrlKey)) {
         setOpen((open) => !open);
       }
     };
-    document.addEventListener("keydown", down);
-    return () => document.removeEventListener("keydown", down);
+    document.addEventListener('keydown', down);
+    return () => document.removeEventListener('keydown', down);
   }, []);
 
   React.useEffect(() => {
-    let storedTexts = localStorage.getItem("texts");
-    let storedLogs = localStorage.getItem("logs");
+    let storedTexts = localStorage.getItem('texts');
+    let storedLogs = localStorage.getItem('logs');
 
     if (storedTexts) {
       setSavedTexts(JSON.parse(storedTexts));
@@ -247,9 +204,9 @@ export default function Home() {
   }, [savedLogs]);
 
   async function createCategory(event: React.SyntheticEvent) {
-    console.log("Create category called with event: ", event);
+    console.log('Create category called with event: ', event);
 
-    if (inputText === "") return;
+    if (inputText === '') return;
 
     const newTexts: TextItem[] = [
       ...savedTexts,
@@ -260,12 +217,12 @@ export default function Home() {
       },
     ];
 
-    localStorage.setItem("texts", JSON.stringify(newTexts));
+    localStorage.setItem('texts', JSON.stringify(newTexts));
     setSavedTexts(newTexts);
-    setInputText("");
+    setInputText('');
 
     toast({
-      title: "Category created",
+      title: 'Category created',
     });
 
     logRemainingLocalStorageSpace();
@@ -273,9 +230,9 @@ export default function Home() {
   }
 
   async function createLog(event: React.SyntheticEvent) {
-    if (logText === "") return;
+    if (logText === '') return;
 
-    let sizeInBytes = new Blob([logText], { type: "text/plain" }).size;
+    let sizeInBytes = new Blob([logText], { type: 'text/plain' }).size;
 
     let sizeInKB = sizeInBytes / 1024; // Convert bytes to kilobytes
 
@@ -290,14 +247,14 @@ export default function Home() {
       },
     ];
 
-    localStorage.setItem("logs", JSON.stringify(newLogs));
+    localStorage.setItem('logs', JSON.stringify(newLogs));
     setSavedLogs(newLogs);
-    setLogText("");
+    setLogText('');
 
     logRemainingLocalStorageSpace();
 
     toast({
-      title: "Log created",
+      title: 'Log created',
     });
 
     console.log(newLogs);
@@ -305,19 +262,19 @@ export default function Home() {
 
   function renameTextItem(id: number) {
     let oldCategoryName =
-      savedTexts.find((textItem) => textItem.id === id)?.text || "";
+      savedTexts.find((textItem) => textItem.id === id)?.text || '';
     let updatedTexts = savedTexts.map((textItem) =>
-      textItem.id === id ? { ...textItem, text: renamingText || "" } : textItem
+      textItem.id === id ? { ...textItem, text: renamingText || '' } : textItem
     );
 
     let updatedLogs = savedLogs.map((logItem) =>
       logItem.category === oldCategoryName
-        ? { ...logItem, category: renamingText || "" }
+        ? { ...logItem, category: renamingText || '' }
         : logItem
     );
 
-    localStorage.setItem("texts", JSON.stringify(updatedTexts));
-    localStorage.setItem("logs", JSON.stringify(updatedLogs));
+    localStorage.setItem('texts', JSON.stringify(updatedTexts));
+    localStorage.setItem('logs', JSON.stringify(updatedLogs));
 
     setSavedTexts(updatedTexts);
     setSavedLogs(updatedLogs);
@@ -326,7 +283,7 @@ export default function Home() {
     setRenamingId(null);
 
     toast({
-      title: "Category renamed",
+      title: 'Category renamed',
     });
 
     logRemainingLocalStorageSpace();
@@ -334,10 +291,10 @@ export default function Home() {
 
   function renameLogItem(id: number) {
     let updatedLogs = savedLogs.map((logItem) =>
-      logItem.id === id ? { ...logItem, text: renamingText || "" } : logItem
+      logItem.id === id ? { ...logItem, text: renamingText || '' } : logItem
     );
 
-    localStorage.setItem("logs", JSON.stringify(updatedLogs));
+    localStorage.setItem('logs', JSON.stringify(updatedLogs));
 
     setSavedLogs(updatedLogs);
 
@@ -345,7 +302,7 @@ export default function Home() {
     setRenamingId(null);
 
     toast({
-      title: "Log renamed",
+      title: 'Log renamed',
     });
 
     logRemainingLocalStorageSpace();
@@ -353,19 +310,19 @@ export default function Home() {
 
   function deleteTextItem(id: number) {
     let categoryNameToDelete =
-      savedTexts.find((textItem) => textItem.id === id)?.text || "";
+      savedTexts.find((textItem) => textItem.id === id)?.text || '';
     let filteredTexts = savedTexts.filter((textItem) => textItem.id !== id);
     let filteredLogs = savedLogs.filter(
       (logItem) => logItem.category !== categoryNameToDelete
     );
 
-    localStorage.setItem("texts", JSON.stringify(filteredTexts));
-    localStorage.setItem("logs", JSON.stringify(filteredLogs));
+    localStorage.setItem('texts', JSON.stringify(filteredTexts));
+    localStorage.setItem('logs', JSON.stringify(filteredLogs));
     setSavedTexts(filteredTexts);
     setSavedLogs(filteredLogs);
 
     toast({
-      title: "Category deleted",
+      title: 'Category deleted',
     });
 
     if (renamingId === id) {
@@ -378,7 +335,7 @@ export default function Home() {
 
   function deleteLogItem(id: number) {
     let filteredLogs = savedLogs.filter((logItem) => logItem.id !== id);
-    localStorage.setItem("logs", JSON.stringify(filteredLogs));
+    localStorage.setItem('logs', JSON.stringify(filteredLogs));
     setSavedLogs(filteredLogs);
 
     logRemainingLocalStorageSpace();
@@ -426,8 +383,8 @@ export default function Home() {
 
   function formatCurrentTime() {
     const date = new Date();
-    const month = ("0" + (date.getMonth() + 1)).slice(-2); // months are zero indexed
-    const day = ("0" + date.getDate()).slice(-2);
+    const month = ('0' + (date.getMonth() + 1)).slice(-2); // months are zero indexed
+    const day = ('0' + date.getDate()).slice(-2);
     const year = date.getFullYear();
 
     return `${month}/${day}/${year}`;
@@ -472,6 +429,7 @@ export default function Home() {
                       className="flex justify-center items-center max-w-[25rem] rounded-md"
                     />
 
+                    {/* Category Switcher */}
                     <TeamSwitcher
                       // @ts-ignore
                       savedLogs={savedLogs}
@@ -484,6 +442,7 @@ export default function Home() {
                     />
                   </div>
 
+                  {/* Button to open Command Dialog */}
                   <Button
                     onClick={() => setOpen(true)}
                     variant="default"
@@ -501,450 +460,74 @@ export default function Home() {
             </header>
 
             <div>
-              <CommandDialog
+              <CommandDialogWrapper
                 open={open}
-                onOpenChange={() => {
-                  setOpen(!open);
-                  setLogCommand(false);
-                  setInitialCommand(true);
-                  setCategoryCommand(false);
-                  setRenamingId(null);
-                  setRenamingText(null);
-                }}
+                setOpen={setOpen}
+                setLogCommand={setLogCommand}
+                setInitialCommand={setInitialCommand}
+                setCategoryCommand={setCategoryCommand}
+                setRenamingId={setRenamingId}
+                setRenamingText={setRenamingText}
               >
                 {initialCommand && (
-                  <>
-                    <CommandInput placeholder="Search for category" />
-
-                    <CommandList>
-                      <CommandEmpty>No results found.</CommandEmpty>
-                      <CommandGroup heading="Create">
-                        <CommandItem
-                          onSelect={() => {
-                            setInitialCommand(false);
-                            setCategoryCommand(true);
-                          }}
-                        >
-                          <Plus className="h-5 w-5 mr-2 order-first" />
-                          New Category
-                        </CommandItem>
-                      </CommandGroup>
-                      <CommandGroup heading="Preset Categories">
-                        <CommandItem
-                          onSelect={() => {
-                            setCategoryCommand(false);
-                            setInitialCommand(false);
-                            setLogCommand(true);
-                            setCurrentCategory("Thoughts");
-                          }}
-                        >
-                          <Lightbulb className="mr-2 h-4 w-4" />
-                          Thoughts
-                        </CommandItem>
-                        <CommandItem
-                          onSelect={() => {
-                            setCategoryCommand(false);
-                            setInitialCommand(false);
-                            setLogCommand(true);
-                            setCurrentCategory("Bookmarks");
-                          }}
-                        >
-                          <BookOpen className="mr-2 h-4 w-4" />
-                          Bookmarks
-                        </CommandItem>
-                      </CommandGroup>
-
-                      <CommandSeparator />
-
-                      <CommandGroup heading="My Categories">
-                        {savedTexts.length > 0 ? (
-                          savedTexts.map((text) => (
-                            <ContextMenu key={text.id}>
-                              <ContextMenuTrigger>
-                                <div className="flex justify-between items-center w-full">
-                                  {renamingId === text.id ? (
-                                    <div className="flex w-full space-x-2 mt-2 mb-2">
-                                      <Input
-                                        value={renamingText || ""}
-                                        onChange={(e) =>
-                                          setRenamingText(e.target.value)
-                                        }
-                                        autoFocus={true}
-                                      />
-                                      <Button
-                                        disabled={renamingText === null}
-                                        onClick={() => renameTextItem(text.id)}
-                                      >
-                                        Rename
-                                      </Button>
-                                    </div>
-                                  ) : (
-                                    <CommandItem
-                                      className="flex justify-between items-center w-full"
-                                      onSelect={() => {
-                                        setLogCommand(true);
-                                        setInitialCommand(false);
-
-                                        setCurrentCategory(text.text);
-
-                                        console.log(
-                                          `in the ${text.text} category`
-                                        ); // print the category
-                                      }}
-                                    >
-                                      <div className="flex">
-                                        <BrainCog className="mr-2 h-4 w-4" />
-                                        {text.text}
-                                      </div>
-
-                                      <TooltipProvider>
-                                        <Tooltip>
-                                          <TooltipTrigger>
-                                            <Info className="h-4 w-4" />
-                                          </TooltipTrigger>
-                                          <TooltipContent>
-                                            <p>
-                                              Right click this category to
-                                              rename or delete it.
-                                            </p>
-                                          </TooltipContent>
-                                        </Tooltip>
-                                      </TooltipProvider>
-                                    </CommandItem>
-                                  )}
-                                </div>
-                              </ContextMenuTrigger>
-                              <ContextMenuContent>
-                                <ContextMenuItem
-                                  onSelect={() => setRenamingId(text.id)}
-                                >
-                                  <Pen className="mr-2 h-4 w-4" />
-                                  Rename
-                                </ContextMenuItem>
-                                <ContextMenuItem
-                                  onSelect={() => deleteTextItem(text.id)}
-                                >
-                                  <Trash className="mr-2 h-4 w-4" />
-                                  Delete
-                                </ContextMenuItem>
-                              </ContextMenuContent>
-                            </ContextMenu>
-                          ))
-                        ) : (
-                          <h1 className="text-sm text-gray-400">
-                            You don&apos;t have any saved categories yet.
-                          </h1>
-                        )}
-                      </CommandGroup>
-
-                      <CommandSeparator />
-                    </CommandList>
-                  </>
+                  <InitialCommandDialog
+                    setInitialCommand={setInitialCommand}
+                    setCategoryCommand={setCategoryCommand}
+                    setLogCommand={setLogCommand}
+                    setCurrentCategory={setCurrentCategory}
+                    savedTexts={savedTexts}
+                    renamingId={renamingId}
+                    setRenamingId={setRenamingId}
+                    setRenamingText={setRenamingText}
+                    renameTextItem={renameTextItem}
+                    deleteTextItem={deleteTextItem}
+                  />
                 )}
 
                 {logCommand && (
-                  <>
-                    <CommandList>
-                      <CommandEmpty>No results found.</CommandEmpty>
-
-                      <CommandSeparator />
-                    </CommandList>
-                    <CommandList>
-                      <CommandGroup
-                        heading={`Create a new log in category: ${
-                          currentCategory ? currentCategory : "Default"
-                        }`}
-                      >
-                        <CommandItem>
-                          <Textarea
-                            onChange={handleLogChange}
-                            placeholder="Ex. Cool design I saw today..."
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                createLog(e);
-                                setCategoryCommand(false);
-                                setLogCommand(false);
-                                setInitialCommand(true);
-                                setOpen(false);
-                              }
-                            }}
-                          />
-                        </CommandItem>
-                        <CommandItem
-                          onSelect={(e) => {
-                            //   @ts-ignore
-                            createLog(e);
-                            setCategoryCommand(false);
-                            setLogCommand(false);
-                            setInitialCommand(true);
-                            setOpen(false);
-                          }}
-                          disabled={logText === ""}
-                          className={`mb-1.5 ${
-                            logText === "" ? "cursor-not-allowed" : ""
-                          }`}
-                        >
-                          <BookUp className="mr-2 h-4 w-4" />
-                          Submit
-                        </CommandItem>
-                        <CommandItem
-                          onSelect={() => {
-                            setInitialCommand(true);
-                            setLogCommand(false);
-                          }}
-                          className="mb-1.5"
-                        >
-                          <CornerDownLeft className="mr-2 h-4 w-4" />
-                          Main Menu
-                        </CommandItem>
-                      </CommandGroup>
-                    </CommandList>
-                  </>
+                  <LogCommandDialog
+                    currentCategory={currentCategory}
+                    handleLogChange={handleLogChange}
+                    createLog={createLog}
+                    setCategoryCommand={setCategoryCommand}
+                    setLogCommand={setLogCommand}
+                    setInitialCommand={setInitialCommand}
+                    setOpen={setOpen}
+                    logText={logText}
+                  />
                 )}
 
                 {categoryCommand && (
-                  <>
-                    <CommandList>
-                      <CommandEmpty>No results found.</CommandEmpty>
-
-                      <CommandSeparator />
-                    </CommandList>
-                    <CommandList>
-                      <CommandGroup heading="Create a new category">
-                        <div className="flex w-full mt-4 mb-4 items-center space-x-2">
-                          <Input
-                            onChange={handleInputChange}
-                            placeholder="Ex... Design"
-                            value={inputText}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                createCategory(e);
-                                setInitialCommand(true);
-                                setCategoryCommand(false);
-                              }
-                            }}
-                          />{" "}
-                          <Button
-                            type="submit"
-                            variant="outline"
-                            disabled={inputText === ""}
-                            onClick={(e) => {
-                              createCategory(e);
-                              setInitialCommand(true);
-                              setCategoryCommand(false);
-                            }}
-                          >
-                            Create
-                          </Button>
-                        </div>
-
-                        <CommandItem
-                          onSelect={() => {
-                            setInitialCommand(true);
-                            setCategoryCommand(false);
-                          }}
-                          className="mb-1.5"
-                          autoFocus={false}
-                        >
-                          <CornerDownLeft className="mr-2 h-4 w-4" />
-                          Main Menu
-                        </CommandItem>
-                      </CommandGroup>
-                    </CommandList>
-                  </>
+                  <CategoryCommandDialog
+                    handleInputChange={handleInputChange}
+                    inputText={inputText}
+                    createCategory={createCategory}
+                    setInitialCommand={setInitialCommand}
+                    setCategoryCommand={setCategoryCommand}
+                  />
                 )}
-              </CommandDialog>
+              </CommandDialogWrapper>
 
               <div className="mb-4" />
 
-              <Table className="mb-20">
-                <TableCaption>A list of your recent logs.</TableCaption>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[300px]">Log Name</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead className="hidden sm:table-cell">Size</TableHead>
-
-                    <TableHead className="hidden sm:table-cell">
-                      Created
-                    </TableHead>
-
-                    <TableHead className="text-right">View</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredTexts.length > 0 ? (
-                    filteredTexts.map((log) => (
-                      <TableRow key={log.id}>
-                        <TableCell className="font-medium truncate md:max-w-[300px] max-w-[50px]">
-                          {log.text}
-                        </TableCell>
-                        <TableCell>
-                          <Badge>{log.category}</Badge>
-                        </TableCell>
-
-                        <TableCell className="hidden sm:sm:table-cell">
-                          {/* add the following logic: if it has 3 leading 0s, show it as "<0.01" */}
-                          {log.size < 0.01
-                            ? "<0.01 KB"
-                            : log.size.toFixed(2) + " KB"}
-                        </TableCell>
-
-                        <TableCell className="hidden sm:sm:table-cell">
-                          <time>
-                            {log.createdTime
-                              ? log.createdTime.toLocaleString()
-                              : ""}
-                          </time>
-                        </TableCell>
-
-                        <TableCell className="text-right">
-                          <Sheet>
-                            <SheetTrigger>
-                              {" "}
-                              <Button variant="ghost">
-                                <BookOpen className="h-5 w-5" />
-                                <span className="ml-2">View</span>
-                              </Button>
-                            </SheetTrigger>
-                            <SheetContent size="xl">
-                              <SheetHeader>
-                                <SheetTitle>View Log</SheetTitle>
-                                <SheetTitle>
-                                  <div className="flex space-x-2">
-                                    <Badge>{log.category}</Badge>
-                                    <Badge>{log.size} KB</Badge>
-                                    <Badge>
-                                      {log.createdTime
-                                        ? log.createdTime.toLocaleString()
-                                        : ""}
-                                    </Badge>
-                                  </div>
-                                </SheetTitle>
-
-                                <Separator />
-
-                                <SheetDescription>
-                                  <ScrollArea className="h-96">
-                                    {renamingId === log.id ? (
-                                      <>
-                                        <Textarea
-                                          className="whitespace-pre-wrap overflow-auto"
-                                          onChange={(e) => {
-                                            setRenamingText(e.target.value);
-                                          }}
-                                          defaultValue={log.text}
-                                        />
-
-                                        <Button
-                                          className="w-full mt-4"
-                                          disabled={
-                                            renamingText === null ||
-                                            renamingText === ""
-                                          }
-                                          onClick={() => {
-                                            console.log(
-                                              "renamingText",
-                                              renamingText
-                                            );
-                                            renameLogItem(
-                                              log.id,
-                                              // @ts-ignore
-                                              renamingText
-                                            );
-
-                                            // @ts-ignore
-                                            setRenamingId("");
-                                          }}
-                                        >
-                                          <Check className="h-5 w-5 mr-2" />
-                                          Save
-                                        </Button>
-
-                                        <Button
-                                          variant="ghost"
-                                          className="w-full mt-4"
-                                          onClick={() => {
-                                            // @ts-ignore
-                                            setRenamingId("");
-                                            setRenamingText("");
-                                          }}
-                                        >
-                                          <X className="h-5 w-5 mr-2" />
-                                          Cancel
-                                        </Button>
-                                      </>
-                                    ) : (
-                                      <pre className="whitespace-pre-wrap overflow-auto">
-                                        {log.text}
-                                      </pre>
-                                    )}
-                                  </ScrollArea>
-
-                                  <div className="mt-4">
-                                    <Separator />
-                                  </div>
-
-                                  <div className="flex justify-between">
-                                    <Button
-                                      variant="outline"
-                                      className="mt-4"
-                                      onClick={() => {
-                                        setRenamingId(log.id);
-                                      }}
-                                    >
-                                      <Pen className="h-5 w-5 mr-2" />
-                                      Edit Log
-                                    </Button>
-                                    <Button
-                                      variant="destructive"
-                                      className="mt-4"
-                                      onClick={() => deleteLogItem(log.id)}
-                                    >
-                                      <Trash className="h-5 w-5 mr-2" />
-                                      Delete Log
-                                    </Button>
-                                  </div>
-                                </SheetDescription>
-                              </SheetHeader>
-                            </SheetContent>
-                          </Sheet>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableSkeleton />
-                  )}
-                </TableBody>
-              </Table>
+              <TableData
+                filteredTexts={filteredTexts}
+                renamingId={renamingId}
+                setRenamingId={setRenamingId}
+                setRenamingText={setRenamingText}
+                renameLogItem={renameLogItem}
+                deleteLogItem={deleteLogItem}
+              />
             </div>
           </main>
         </div>
       </div>
 
-      <div className="fixed bottom-0 w-full">
-        <div className="bg-background p-4 z-50 border-t">
-          <div className="mx-auto max-w-2xl">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger className="w-full">
-                  <Progress
-                    className="w-full"
-                    value={remainingStoragePercentage}
-                  />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Your remaining storage:</p>
-
-                  <p className="text-center">
-                    <span className="font-bold">{remainingSpace}</span> bytes
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        </div>
-      </div>
+      <Footer
+        //  @ts-ignore
+        remainingStoragePercentage={remainingStoragePercentage}
+        remainingSpace={remainingSpace}
+      />
     </>
   );
 }
