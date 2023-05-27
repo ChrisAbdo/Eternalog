@@ -1,12 +1,13 @@
-"use client";
+'use client';
 
-import React from "react";
-import { motion } from "framer-motion";
-import { FADE_DOWN_ANIMATION_VARIANTS } from "@/lib/constants";
-import { Balancer } from "react-wrap-balancer";
-import Link from "next/link";
-import { BookOpen, Star } from "lucide-react";
-import { Button } from "../ui/button";
+import React from 'react';
+import { motion } from 'framer-motion';
+import { FADE_DOWN_ANIMATION_VARIANTS } from '@/lib/constants';
+import { Balancer } from 'react-wrap-balancer';
+import Link from 'next/link';
+import { BookOpen, Star } from 'lucide-react';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
 
 export default function IntroText() {
   return (
@@ -60,6 +61,15 @@ export default function IntroText() {
             Star on Github
           </Button>
         </Link>
+      </motion.div>
+
+      <motion.div
+        variants={FADE_DOWN_ANIMATION_VARIANTS}
+        className="mt-6 space-x-4 flex justify-center"
+      >
+        <Badge variant="secondary">Accountless</Badge>
+        <Badge variant="secondary">Permanent</Badge>
+        <Badge variant="secondary">Instant</Badge>
       </motion.div>
     </motion.div>
   );

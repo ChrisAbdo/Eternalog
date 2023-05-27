@@ -1,7 +1,7 @@
 'use client';
 
+import React from 'react';
 import Link from 'next/link';
-import Script from 'next/script';
 import ThemeSwitcher from '@/components/theme-switch';
 import { Button } from '@/components/ui/button';
 import { Brain } from 'lucide-react';
@@ -9,28 +9,28 @@ import IntroText from '@/components/landing/intro-text';
 import Footer from '@/components/landing/footer';
 import ThemeImg from '@/components/landing/theme-img';
 
-export default function Example() {
-  const features = [
-    {
-      name: 'Instant thought storage',
-      description:
-        'Eternalog allows you to store your thoughts and ideas instantly. All it takes is a few clicks and typing in your thought.',
-      href: '/eternalog',
-    },
-    {
-      name: 'Categorize all your thoughts',
-      description:
-        'Put your thoughts into categories to make it easier to find them later. You can also add tags to your thoughts to make them even easier to find.',
-      href: '/eternalog',
-    },
-    {
-      name: 'Remains there forever.',
-      description:
-        'The way Eternalog is built allows your thoughts to be stored forever. No need to worry about losing your thoughts, unless you manually delete them.',
-      href: '/eternalog',
-    },
-  ];
+const features = [
+  {
+    name: 'Instant thought storage',
+    description:
+      'Eternalog allows you to store your thoughts and ideas instantly. All it takes is a few clicks and typing in your thought.',
+    href: '/eternalog',
+  },
+  {
+    name: 'Categorize all your thoughts',
+    description:
+      'Put your thoughts into categories to make it easier to find them later. You can also add tags to your thoughts to make them even easier to find.',
+    href: '/eternalog',
+  },
+  {
+    name: 'Remains there forever.',
+    description:
+      'The way Eternalog is built allows your thoughts to be stored forever. No need to worry about losing your thoughts, unless you manually delete them.',
+    href: '/eternalog',
+  },
+];
 
+export default function Home() {
   return (
     <div>
       <header className="absolute inset-x-0 top-0 z-50">
@@ -79,7 +79,7 @@ export default function Example() {
           />
         </div>
 
-        <div className="py-24 sm:py-32 lg:pb-40">
+        <div className="py-12 sm:py-16 lg:pb-20">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
               <IntroText />
